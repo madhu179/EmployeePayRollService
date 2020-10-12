@@ -34,8 +34,8 @@ public class FileOperationsTest {
 			Files.createFile(filePath);
 			Assert.assertTrue(Files.exists(filePath));
 		}
-		
-		//create empty file without extension
+
+		// create empty file without extension
 		Path filePath = Paths.get(pathVar + "/file6");
 		Files.createFile(filePath);
 		Assert.assertTrue(Files.exists(filePath));
@@ -55,6 +55,13 @@ public class FileOperationsTest {
 		// List files.Directories etc
 		Files.list(pathVar).forEach(System.out::println);
 		Files.newDirectoryStream(insideFolder).forEach(System.out::println);
+	}
+
+	@Test
+	public void givenADirTestWatcher() throws IOException {
+		Path pathVar = Paths.get(HOME + "/" + "TestFolder2");
+		Files.list(pathVar).forEach(System.out::println);
+		new WatchServiceCustom(pathVar).processEvents();
 	}
 
 }
