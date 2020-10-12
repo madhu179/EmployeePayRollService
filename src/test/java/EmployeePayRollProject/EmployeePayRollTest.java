@@ -13,6 +13,7 @@ public class EmployeePayRollTest {
 		empPayRoll.add(new EmployeePayRoll(2,"Bruce Wayne",500000));
 		EmployeePayRollService empPayRollService = new EmployeePayRollService(empPayRoll);
 		empPayRollService.writeData("File");
+		empPayRollService.printData("File");
 		int entries = empPayRollService.noOfEntries("File");
 		boolean result = entries==2 ? true : false;
 		Assert.assertTrue(result);

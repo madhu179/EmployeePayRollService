@@ -49,4 +49,16 @@ public class EmployeePayRollService {
 		return 0;
 	}
 
+	public void printData(String destination) {
+		if (destination.equals("Console"))
+			for(EmployeePayRoll e : empPayRollList)
+			{
+				System.out.println(e.toString()+"\n");
+			}
+		else if (destination.equals("File"))
+			new EmployeePayRollFileService().printData();
+		
+		
+	}
+
 }
