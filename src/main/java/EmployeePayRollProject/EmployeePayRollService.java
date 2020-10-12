@@ -10,6 +10,10 @@ public class EmployeePayRollService {
 		this.empPayRollList = empPayRollList;
 	}
 
+	public EmployeePayRollService() {
+
+	}
+
 	public static void main(String[] args) {
 		ArrayList<EmployeePayRoll> empPayRollList = new ArrayList<EmployeePayRoll>();
 		EmployeePayRollService empPayRollService = new EmployeePayRollService(empPayRollList);
@@ -34,6 +38,15 @@ public class EmployeePayRollService {
 		empPayRollList.add(empPayRollObject);
 	}
 
+	public int readData(String source) {
+		List<EmployeePayRoll> empPayRoll = new ArrayList<EmployeePayRoll>();
+		if (source.equals("File")) {
+			empPayRoll = new EmployeePayRollFileService().readData();
+			return empPayRoll.size();
+		}
+		return 0;
+	}
+
 	public void writeData(String destination) {
 		if (destination.equals("Console"))
 			System.out.println("Employee Pay Roll Data : \n" + empPayRollList.get(0).toString());
@@ -51,14 +64,12 @@ public class EmployeePayRollService {
 
 	public void printData(String destination) {
 		if (destination.equals("Console"))
-			for(EmployeePayRoll e : empPayRollList)
-			{
-				System.out.println(e.toString()+"\n");
+			for (EmployeePayRoll e : empPayRollList) {
+				System.out.println(e.toString() + "\n");
 			}
 		else if (destination.equals("File"))
 			new EmployeePayRollFileService().printData();
-		
-		
+
 	}
 
 }

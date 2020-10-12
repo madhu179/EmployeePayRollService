@@ -1,6 +1,7 @@
 package EmployeePayRollProject;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.io.*;
 import java.nio.file.*;
@@ -16,7 +17,7 @@ public class EmployeePayRollFileService {
 	public void writeData(List<EmployeePayRoll> empPayRollList) {
 		StringBuffer data = new StringBuffer();
 		for (EmployeePayRoll e : empPayRollList) {
-			data.append(e.toString()+"\n");
+			data.append(e.toString() + "\n");
 		}
 		Path filePath = Paths.get(DATA_FILE);
 		try {
@@ -41,11 +42,36 @@ public class EmployeePayRollFileService {
 	public void printData() {
 		Path filePath = Paths.get(DATA_FILE);
 		try {
-			Stream<String> stringStream= Files.lines(filePath);
+			Stream<String> stringStream = Files.lines(filePath);
 			stringStream.forEach(System.out::println);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public List<EmployeePayRoll> readData() {
+		List<String[]> listOfElements = null;
+		List<EmployeePayRoll> empPayRoll = new ArrayList<EmployeePayRoll>();
+		Path filePath = Paths.get(DATA_FILE);
+		String[] data = new String[3];
+		int i = 0;
+		try {
+			Stream<String> stringStr = Files.lines(filePath);
+			listOfElements = stringStr.map(s -> s.split(", ")).collect(Collectors.toList());
+			for (String[] e : listOfElements) {
+				for (String s : e) {
+					data[i] = e[i].split("=")[1];
+					i += 1;
+				}
+				i = 0;
+				empPayRoll.add(new EmployeePayRoll(Integer.parseInt(data[0]), data[1], Double.parseDouble(data[2])));
+			}
+			return empPayRoll;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 
 }
