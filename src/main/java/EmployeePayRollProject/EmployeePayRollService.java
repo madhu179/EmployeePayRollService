@@ -39,17 +39,31 @@ public class EmployeePayRollService {
 	}
 
 	public int readData(String source) {
-		List<EmployeePayRoll> empPayRoll = new ArrayList<EmployeePayRoll>();
 		if (source.equals("File")) {
-			empPayRoll = new EmployeePayRollFileService().readData();
-			return empPayRoll.size();
+			empPayRollList = new EmployeePayRollFileService().readData();
+			return empPayRollList.size();
 		}
 		else if(source.equals("DB"))
 		{
-			empPayRoll = new EmployeePayRollDBService().readData();
-			return empPayRoll.size();
+			empPayRollList = new EmployeePayRollDBService().readData();
+			return empPayRollList.size();
 		}
 		return 0;
+	}
+	
+	public void updateSalary(String name,Double salary)
+	{
+		int success = new EmployeePayRollDBService().updateSalary(name,salary);
+        if(success==1)
+        {
+        	for(EmployeePayRoll e : empPayRollList)
+        	{
+        		if(e.getName().equals(name))
+        		{
+        			e.setSalary(salary);
+        		}
+        	}
+        }
 	}
 
 	public void writeData(String destination) {
@@ -75,6 +89,17 @@ public class EmployeePayRollService {
 		else if (destination.equals("File"))
 			new EmployeePayRollFileService().printData();
 
+	}
+
+	public boolean checkDBInSyncWithList(String name) {
+		EmployeePayRoll employeeDB = new EmployeePayRollDBService().getEmployee(name);
+		EmployeePayRoll employeeList = getEmployee(name);
+		return employeeDB.equals(employeeList);
+	}
+	
+	private EmployeePayRoll getEmployee(String name)
+	{
+		return empPayRollList.stream().filter(e->e.getName().equals(name)).findFirst().orElse(null);
 	}
 
 }

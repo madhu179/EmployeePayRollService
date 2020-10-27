@@ -9,9 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeePayRollDBService {
+	
+	List<EmployeePayRoll> employeePayRollList = new ArrayList<EmployeePayRoll>();
 
 	public List<EmployeePayRoll> readData() {
-		List<EmployeePayRoll> employeePayRollList = new ArrayList<EmployeePayRoll>();
 		String query = "select * from employee_payroll";
 		Statement statement;
 		ResultSet result=null;
@@ -27,6 +28,24 @@ public class EmployeePayRollDBService {
 		}
 		return employeePayRollList;
 	}
+	
+	public int updateSalary(String name,Double salary){	
+		return this.updateSalaryUsingStatement(name,salary);
+	}
+
+	private int updateSalaryUsingStatement(String name, Double salary) {
+		String query = String.format("update employee_payroll set salary = %.2f where name = '%s' ;",salary,name);
+		Statement statement;
+		int result=0;
+		try(Connection connection = this.getConnection();) {
+			statement = connection.createStatement();
+			 result = statement.executeUpdate(query);
+			 return result;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
 
 	private Connection getConnection() {
 		String jdbcURL = "jdbc:mysql://localhost:3306/employee_payroll_service?useSSL=false";
@@ -37,9 +56,13 @@ public class EmployeePayRollDBService {
 			 connection = DriverManager.getConnection(jdbcURL, userName, password);
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
-		
+		}	
 		return connection;
+	}
+
+	public EmployeePayRoll getEmployee(String name) {
+		this.readData();
+		return employeePayRollList.stream().filter(e->e.getName().equals(name)).findFirst().orElse(null);
 	}
 
 }

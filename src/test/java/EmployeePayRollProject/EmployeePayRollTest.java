@@ -6,7 +6,7 @@ import java.util.*;
 public class EmployeePayRollTest {
 
 	@Test
-	public void given3EmployeesStoreToFileShouldPassTest() {
+	public void given3Employees_StoreToFile_ShouldPassTest() {
 		ArrayList<EmployeePayRoll> empPayRoll = new ArrayList<EmployeePayRoll>();
 		empPayRoll.add(new EmployeePayRoll(1, "Tony Stark", 1000000));
 		empPayRoll.add(new EmployeePayRoll(2, "Bruce Wayne", 500000));
@@ -19,7 +19,7 @@ public class EmployeePayRollTest {
 	}
 
 	@Test
-	public void readingFromFileNoOfEntriesShouldMatchActual() {
+	public void readingFromFile_NoOfEntries_ShouldMatchActual() {
 		EmployeePayRollService empPayRollService = new EmployeePayRollService();
 		int entries = empPayRollService.readData("File");
 		boolean result = entries == 2 ? true : false;
@@ -27,10 +27,19 @@ public class EmployeePayRollTest {
 	}
 	
 	@Test
-	public void readingFromDBNoOfEntriesShouldMatchActual() {
+	public void readingFromDB_NoOfEntries_ShouldMatchActual() {
 		EmployeePayRollService empPayRollService = new EmployeePayRollService();
 		int entries = empPayRollService.readData("DB");
 		boolean result = entries == 4 ? true : false;
+		Assert.assertTrue(result);
+	}
+	
+	@Test
+	public void givenNewSalary_UpdatinginDB_ShouldMatch() {
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		int entries = empPayRollService.readData("DB");
+		empPayRollService.updateSalary("Natasha",90000.0);
+		boolean result = empPayRollService.checkDBInSyncWithList("Natasha");
 		Assert.assertTrue(result);
 	}
 
