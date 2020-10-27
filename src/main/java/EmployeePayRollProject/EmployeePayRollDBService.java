@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class EmployeePayRollDBService {
@@ -101,6 +102,43 @@ public class EmployeePayRollDBService {
 			ResultSet result = preparedStatement.executeQuery();
 			employeePayRollList = getDatafromResultset(result);
 			return employeePayRollList;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public HashMap<String, Double> getMinMaxSumAvgCount() {
+		HashMap<String,Double> functionMap = new HashMap<String,Double>();
+		List<Double> min = getDataBasedOnQuery("select min(salary),gender from employee_payroll group by gender");
+		List<Double> max = getDataBasedOnQuery("select max(salary),gender from employee_payroll group by gender");
+		List<Double> sum = getDataBasedOnQuery("select sum(salary),gender from employee_payroll group by gender");
+		List<Double> avg = getDataBasedOnQuery("select avg(salary),gender from employee_payroll group by gender;");
+		functionMap.put("minMale",min.get(0));
+		functionMap.put("minFemale",min.get(1));
+		functionMap.put("maxMale",max.get(0));
+		functionMap.put("maxFemale",max.get(1));
+		functionMap.put("sumMale",sum.get(0));
+		functionMap.put("sumFemale",sum.get(1));
+		functionMap.put("avgMale",avg.get(0));
+		functionMap.put("avgFemale",avg.get(1));		
+		return functionMap;
+	}
+	
+	public List<Double>  getDataBasedOnQuery(String query) {
+		List<Double> functionList = new ArrayList<Double>();
+		Statement statement;
+		ResultSet result;
+		try (Connection connection = this.getConnection();) {
+			statement = connection.createStatement();
+			result = statement.executeQuery(query);
+			int i=0;
+			while(result.next())
+			{
+                i=i+1;
+                functionList.add(result.getDouble(1));
+			}
+			return functionList;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

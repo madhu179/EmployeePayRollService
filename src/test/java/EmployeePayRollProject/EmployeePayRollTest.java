@@ -75,5 +75,15 @@ public class EmployeePayRollTest {
 		boolean result = empPayRoll.size()==2;
 		Assert.assertTrue(result);
 	}
+	
+	@Test
+	public void findMinMaxSumAvgcount_GroupedByGender_ShouldMatch() {
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		int entries = empPayRollService.readData("DB");	
+		HashMap<String,Double> output = empPayRollService.getMinMaxSumAvgCount();
+		boolean result = output.get("minMale").equals(70000.0) && output.get("maxMale").equals(130000.0) && output.get("sumMale").equals(300000.0) && 
+				output.get("avgMale").equals(100000.0) && output.get("minFemale").equals(90000.0) && output.get("sumFemale").equals(90000.0);
+		Assert.assertTrue(result);
+	}
 
 }

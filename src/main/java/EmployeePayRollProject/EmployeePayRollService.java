@@ -106,4 +106,8 @@ public class EmployeePayRollService {
 		return employeePayRollDBService.getDataInDateRange(startDate,endDate);
 	}
 
+	public HashMap<String,Double> getMinMaxSumAvgCount() {
+		return employeePayRollDBService.getMinMaxSumAvgCount();
+	}
+
 }
