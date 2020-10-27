@@ -6,7 +6,6 @@ public class EmployeePayRoll {
 
 	private int id;
 	private String name;
-	private String gender;
 	private double salary;
 	private LocalDate startDate;
 
@@ -16,9 +15,8 @@ public class EmployeePayRoll {
 		this.salary = salary;
 	}
 	
-	public EmployeePayRoll(int id, String name, String gender, double salary, LocalDate startDate) {
+	public EmployeePayRoll(int id, String name, double salary, LocalDate startDate) {
 		this(id,name,salary);
-		this.gender = gender;
 		this.startDate = startDate;
 	}
 
@@ -45,14 +43,6 @@ public class EmployeePayRoll {
 	public void setSalary(double salary) {
 		this.salary = salary;
 	}
-	
-	public String getGender() {
-		return gender;
-	}
-
-	public void setGender(String gender) {
-		this.gender = gender;
-	}
 
 	public LocalDate getStartDate() {
 		return startDate;
@@ -75,11 +65,6 @@ public class EmployeePayRoll {
 		if (getClass() != obj.getClass())
 			return false;
 		EmployeePayRoll other = (EmployeePayRoll) obj;
-		if (gender == null) {
-			if (other.gender != null)
-				return false;
-		} else if (!gender.equals(other.gender))
-			return false;
 		if (id != other.id)
 			return false;
 		if (name == null) {
@@ -96,4 +81,5 @@ public class EmployeePayRoll {
 			return false;
 		return true;
 	}
+	
 }

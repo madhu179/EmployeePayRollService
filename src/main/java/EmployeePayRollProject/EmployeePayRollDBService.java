@@ -10,10 +10,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeePayRollDBService {
-
-	List<EmployeePayRoll> employeePayRollList = new ArrayList<EmployeePayRoll>();
+	private PreparedStatement preparedStatement;
+	private static EmployeePayRollDBService employeePayRollDBService;
+	
+	private EmployeePayRollDBService(){	
+	}
+	
+	public static EmployeePayRollDBService getInstance()
+	{
+		if(employeePayRollDBService==null)
+			employeePayRollDBService = new EmployeePayRollDBService();
+		return employeePayRollDBService;
+	}
 
 	public List<EmployeePayRoll> readData() {
+		List<EmployeePayRoll> employeePayRollList = new ArrayList<EmployeePayRoll>();
 		String query = "select * from employee_payroll";
 		Statement statement;
 		ResultSet result = null;
@@ -22,7 +33,7 @@ public class EmployeePayRollDBService {
 			result = statement.executeQuery(query);
 			while (result.next()) {
 				employeePayRollList.add(
-						new EmployeePayRoll(result.getInt("id"), result.getString("name"), result.getString("gender"),
+						new EmployeePayRoll(result.getInt("id"), result.getString("name"),
 								result.getDouble("salary"), result.getDate("startdate").toLocalDate()));
 			}
 		} catch (SQLException e) {
@@ -80,7 +91,8 @@ public class EmployeePayRollDBService {
 	}
 
 	public EmployeePayRoll getEmployee(String name) {
-		this.readData();
+		List<EmployeePayRoll> employeePayRollList = new ArrayList<EmployeePayRoll>();
+		employeePayRollList = this.readData();
 		return employeePayRollList.stream()
 				.filter(e -> e.getName().equals(name))
 				.findFirst()

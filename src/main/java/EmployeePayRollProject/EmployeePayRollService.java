@@ -4,14 +4,16 @@ import java.util.*;
 
 public class EmployeePayRollService {
 	private static List<EmployeePayRoll> empPayRollList;
+	private static EmployeePayRollDBService employeePayRollDBService;
 	private static Scanner sc = new Scanner(System.in);
 
 	public EmployeePayRollService(List<EmployeePayRoll> empPayRollList) {
+		this();
 		this.empPayRollList = empPayRollList;
 	}
 
 	public EmployeePayRollService() {
-
+		employeePayRollDBService = EmployeePayRollDBService.getInstance();
 	}
 
 	public static void main(String[] args) {
@@ -43,14 +45,14 @@ public class EmployeePayRollService {
 			empPayRollList = new EmployeePayRollFileService().readData();
 			return empPayRollList.size();
 		} else if (source.equals("DB")) {
-			empPayRollList = new EmployeePayRollDBService().readData();
+			empPayRollList = employeePayRollDBService.readData();
 			return empPayRollList.size();
 		}
 		return 0;
 	}
 
 	public void updateSalary(int n, String name, Double salary) {
-		int success = new EmployeePayRollDBService().updateSalary(n, name, salary);
+		int success = employeePayRollDBService.updateSalary(n, name, salary);
 		if (success == 1) {
 			for (EmployeePayRoll e : empPayRollList) {
 				if (e.getName().equals(name)) {
@@ -86,7 +88,7 @@ public class EmployeePayRollService {
 	}
 
 	public boolean checkDBInSyncWithList(String name) {
-		EmployeePayRoll employeeDB = new EmployeePayRollDBService().getEmployee(name);
+		EmployeePayRoll employeeDB = employeePayRollDBService.getEmployee(name);
 		EmployeePayRoll employeeList = getEmployee(name);
 		return employeeDB.equals(employeeList);
 	}
