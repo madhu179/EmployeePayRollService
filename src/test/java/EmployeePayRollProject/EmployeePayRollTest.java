@@ -25,5 +25,13 @@ public class EmployeePayRollTest {
 		boolean result = entries == 2 ? true : false;
 		Assert.assertTrue(result);
 	}
+	
+	@Test
+	public void readingFromDBNoOfEntriesShouldMatchActual() {
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		int entries = empPayRollService.readData("DB");
+		boolean result = entries == 4 ? true : false;
+		Assert.assertTrue(result);
+	}
 
 }

@@ -44,6 +44,11 @@ public class EmployeePayRollService {
 			empPayRoll = new EmployeePayRollFileService().readData();
 			return empPayRoll.size();
 		}
+		else if(source.equals("DB"))
+		{
+			empPayRoll = new EmployeePayRollDBService().readData();
+			return empPayRoll.size();
+		}
 		return 0;
 	}
 

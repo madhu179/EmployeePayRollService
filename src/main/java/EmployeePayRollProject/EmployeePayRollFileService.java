@@ -43,7 +43,6 @@ public class EmployeePayRollFileService {
 		Path filePath = Paths.get(DATA_FILE);
 		try {
 			Stream<String> stringStream = Files.lines(filePath);
-			stringStream.forEach(System.out::println);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
