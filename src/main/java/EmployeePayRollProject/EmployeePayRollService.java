@@ -97,4 +97,8 @@ public class EmployeePayRollService {
 		return empPayRollList.stream().filter(e -> e.getName().equals(name)).findFirst().orElse(null);
 	}
 
+	public EmployeePayRoll preparedStatementReadData(String name) {
+		return employeePayRollDBService.preparedStatementReadData(name);
+	}
+
 }

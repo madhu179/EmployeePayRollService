@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeePayRollDBService {
+	
 	private PreparedStatement preparedStatement;
+	
 	private static EmployeePayRollDBService employeePayRollDBService;
 	
 	private EmployeePayRollDBService(){	
@@ -31,11 +33,7 @@ public class EmployeePayRollDBService {
 		try (Connection connection = this.getConnection();) {
 			statement = connection.createStatement();
 			result = statement.executeQuery(query);
-			while (result.next()) {
-				employeePayRollList.add(
-						new EmployeePayRoll(result.getInt("id"), result.getString("name"),
-								result.getDouble("salary"), result.getDate("startdate").toLocalDate()));
-			}
+			employeePayRollList = getDatafromResultset(result);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -51,11 +49,11 @@ public class EmployeePayRollDBService {
 
 	private int updateSalaryUsingPreparedStatement(String name, Double salary) {
 		try (Connection connection = this.getConnection();) {
-			PreparedStatement statement = connection
+			preparedStatement = connection
 					.prepareStatement("update employee_payroll set salary = ? where name = ?");
-			statement.setDouble(1, salary);
-			statement.setString(2, name);
-			int result = statement.executeUpdate();
+			preparedStatement.setDouble(1, salary);
+			preparedStatement.setString(2, name);
+			int result = preparedStatement.executeUpdate();
 			return result;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -75,6 +73,21 @@ public class EmployeePayRollDBService {
 			e.printStackTrace();
 		}
 		return 0;
+	}
+	
+	public EmployeePayRoll preparedStatementReadData(String name) {	
+		List<EmployeePayRoll> employeePayRollList = new ArrayList<EmployeePayRoll>();
+		try (Connection connection = this.getConnection();) {
+			preparedStatement = connection
+					.prepareStatement("select * from  employee_payroll where name = ?");
+			preparedStatement.setString(1, name);
+			ResultSet result = preparedStatement.executeQuery();
+			employeePayRollList = getDatafromResultset(result);
+			return employeePayRollList.get(0);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	private Connection getConnection() {
@@ -98,5 +111,23 @@ public class EmployeePayRollDBService {
 				.findFirst()
 				.orElse(null);
 	}
+	
+	public List<EmployeePayRoll> getDatafromResultset(ResultSet result)
+	{
+		List<EmployeePayRoll> employeePayRollList = new ArrayList<EmployeePayRoll>();
+		try {
+			while (result.next()) {
+				
+					employeePayRollList.add(
+							new EmployeePayRoll(result.getInt("id"), result.getString("name"),
+									result.getDouble("salary"), result.getDate("startdate").toLocalDate()));
+				} 
+			}catch (SQLException e) {
+				e.printStackTrace();
+			}
+		return employeePayRollList;		
+	}
+
+	
 
 }

@@ -1,6 +1,8 @@
 package EmployeePayRollProject;
 
 import org.junit.*;
+
+import java.time.LocalDate;
 import java.util.*;
 
 public class EmployeePayRollTest {
@@ -49,6 +51,17 @@ public class EmployeePayRollTest {
 		int entries = empPayRollService.readData("DB");
 		empPayRollService.updateSalary(2, "Natasha", 80000.0);
 		boolean result = empPayRollService.checkDBInSyncWithList("Natasha");
+		Assert.assertTrue(result);
+	}
+	
+	@Test
+	public void giveName_RetreiveDataFromDB_UsingPreparedStatement_ShouldMatch() {
+		EmployeePayRoll employee;
+		LocalDate startDate = LocalDate.parse("2020-04-29");
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		int entries = empPayRollService.readData("DB");	
+		employee = empPayRollService.preparedStatementReadData("Natasha");
+		boolean result = employee.getStartDate().equals(startDate);
 		Assert.assertTrue(result);
 	}
 
