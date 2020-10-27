@@ -82,7 +82,8 @@ public class EmployeePayRollTest {
 		int entries = empPayRollService.readData("DB");	
 		HashMap<String,Double> output = empPayRollService.getMinMaxSumAvgCount();
 		boolean result = output.get("minMale").equals(70000.0) && output.get("maxMale").equals(130000.0) && output.get("sumMale").equals(300000.0) && 
-				output.get("avgMale").equals(100000.0) && output.get("minFemale").equals(90000.0) && output.get("sumFemale").equals(90000.0);
+				output.get("avgMale").equals(100000.0) && output.get("minFemale").equals(90000.0) && output.get("sumFemale").equals(90000.0)&& 
+				output.get("countMale").equals(3.0) && output.get("countFemale").equals(1.0);
 		Assert.assertTrue(result);
 	}
 

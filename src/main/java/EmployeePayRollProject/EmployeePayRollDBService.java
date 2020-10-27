@@ -114,6 +114,7 @@ public class EmployeePayRollDBService {
 		List<Double> max = getDataBasedOnQuery("select max(salary),gender from employee_payroll group by gender");
 		List<Double> sum = getDataBasedOnQuery("select sum(salary),gender from employee_payroll group by gender");
 		List<Double> avg = getDataBasedOnQuery("select avg(salary),gender from employee_payroll group by gender;");
+		List<Double> count = getDataBasedOnQuery("select count(*),gender from employee_payroll group by gender;");
 		functionMap.put("minMale",min.get(0));
 		functionMap.put("minFemale",min.get(1));
 		functionMap.put("maxMale",max.get(0));
@@ -121,7 +122,9 @@ public class EmployeePayRollDBService {
 		functionMap.put("sumMale",sum.get(0));
 		functionMap.put("sumFemale",sum.get(1));
 		functionMap.put("avgMale",avg.get(0));
-		functionMap.put("avgFemale",avg.get(1));		
+		functionMap.put("avgFemale",avg.get(1));
+		functionMap.put("countMale",count.get(0));
+		functionMap.put("countFemale",count.get(1));	
 		return functionMap;
 	}
 	
