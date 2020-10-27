@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,6 +90,22 @@ public class EmployeePayRollDBService {
 		}
 		return null;
 	}
+	
+	public List<EmployeePayRoll> getDataInDateRange(String startDate, String endDate) {
+		List<EmployeePayRoll> employeePayRollList = new ArrayList<EmployeePayRoll>();
+		try (Connection connection = this.getConnection();) {
+			preparedStatement = connection
+					.prepareStatement("select * from employee_payroll where startdate between cast(? as date) and cast(? as date)");
+			preparedStatement.setString(1,startDate);
+			preparedStatement.setString(2,endDate);			
+			ResultSet result = preparedStatement.executeQuery();
+			employeePayRollList = getDatafromResultset(result);
+			return employeePayRollList;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	private Connection getConnection() {
 		String jdbcURL = "jdbc:mysql://localhost:3306/employee_payroll_service?useSSL=false";
@@ -116,8 +133,7 @@ public class EmployeePayRollDBService {
 	{
 		List<EmployeePayRoll> employeePayRollList = new ArrayList<EmployeePayRoll>();
 		try {
-			while (result.next()) {
-				
+			while (result.next()) {	
 					employeePayRollList.add(
 							new EmployeePayRoll(result.getInt("id"), result.getString("name"),
 									result.getDouble("salary"), result.getDate("startdate").toLocalDate()));
@@ -127,7 +143,5 @@ public class EmployeePayRollDBService {
 			}
 		return employeePayRollList;		
 	}
-
-	
 
 }

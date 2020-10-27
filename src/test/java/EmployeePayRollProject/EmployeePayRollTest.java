@@ -64,5 +64,16 @@ public class EmployeePayRollTest {
 		boolean result = employee.getStartDate().equals(startDate);
 		Assert.assertTrue(result);
 	}
+	
+	@Test
+	public void giveDateRange_RetreiveDataFromDB_UsingPreparedStatement_ShouldMatch() {
+		EmployeePayRoll employee;
+		List<EmployeePayRoll> empPayRoll = new ArrayList<EmployeePayRoll>();
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		int entries = empPayRollService.readData("DB");	
+		empPayRoll = empPayRollService.getDataInDateRange("2010-04-29","2018-04-29");
+		boolean result = empPayRoll.size()==2;
+		Assert.assertTrue(result);
+	}
 
 }

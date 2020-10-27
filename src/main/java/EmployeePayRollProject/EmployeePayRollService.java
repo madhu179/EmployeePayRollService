@@ -1,5 +1,6 @@
 package EmployeePayRollProject;
 
+import java.time.LocalDate;
 import java.util.*;
 
 public class EmployeePayRollService {
@@ -99,6 +100,10 @@ public class EmployeePayRollService {
 
 	public EmployeePayRoll preparedStatementReadData(String name) {
 		return employeePayRollDBService.preparedStatementReadData(name);
+	}
+
+	public List<EmployeePayRoll> getDataInDateRange(String startDate, String endDate) {
+		return employeePayRollDBService.getDataInDateRange(startDate,endDate);
 	}
 
 }
