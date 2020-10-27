@@ -25,7 +25,7 @@ public class EmployeePayRollTest {
 		boolean result = entries == 2 ? true : false;
 		Assert.assertTrue(result);
 	}
-	
+
 	@Test
 	public void readingFromDB_NoOfEntries_ShouldMatchActual() {
 		EmployeePayRollService empPayRollService = new EmployeePayRollService();
@@ -33,12 +33,21 @@ public class EmployeePayRollTest {
 		boolean result = entries == 4 ? true : false;
 		Assert.assertTrue(result);
 	}
-	
+
 	@Test
 	public void givenNewSalary_UpdatinginDB_ShouldMatch() {
 		EmployeePayRollService empPayRollService = new EmployeePayRollService();
 		int entries = empPayRollService.readData("DB");
-		empPayRollService.updateSalary("Natasha",90000.0);
+		empPayRollService.updateSalary(1, "Natasha", 90000.0);
+		boolean result = empPayRollService.checkDBInSyncWithList("Natasha");
+		Assert.assertTrue(result);
+	}
+
+	@Test
+	public void givenNewSalary_UpdatinginDB_UsingPreparedStatement_ShouldMatch() {
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		int entries = empPayRollService.readData("DB");
+		empPayRollService.updateSalary(2, "Natasha", 80000.0);
 		boolean result = empPayRollService.checkDBInSyncWithList("Natasha");
 		Assert.assertTrue(result);
 	}
