@@ -35,7 +35,6 @@ public class EmployeePayRollDBService {
 			statement = connection.createStatement();
 			result = statement.executeQuery(query);
 			employeePayRollList = getDatafromResultset(result);
-
 		} catch (SQLException e) {
 			throw new CustomSQLException(e.getMessage(), CustomSQLException.Exception_Type.READ_FAILED);
 		}
@@ -195,15 +194,19 @@ public class EmployeePayRollDBService {
 
 		int departmentId = 0;
 		try {
-			PreparedStatement preparedStatement3 = connection
-					.prepareStatement("select * from department where name = ?");
-			preparedStatement3.setString(1, departmentName);
-			ResultSet result3 = preparedStatement3.executeQuery();
+			query = String.format("select * from department where name = '%s'", departmentName);
+			Statement statement = connection.createStatement();
+			ResultSet result3 = statement.executeQuery(query);
 			while (result3.next()) {
 				departmentId = (result3.getInt("id"));
 			}
 		} catch (SQLException e2) {
-			e2.printStackTrace();
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			throw new CustomSQLException(e2.getMessage(), CustomSQLException.Exception_Type.ADD_FAILED);
 		}
 		query = String.format("insert into employee_department(emp_id,dept_id,start_date) " + "values('%s',%s,'%s')",
 				employeeId, departmentId, startDate);

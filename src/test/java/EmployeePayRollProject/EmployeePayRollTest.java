@@ -39,7 +39,7 @@ public class EmployeePayRollTest {
 		int entries;
 		try {
 			entries = empPayRollService.readData("DB");
-			boolean result = entries == 6 ? true : false;
+			boolean result = entries == 7 ? true : false;
 			Assert.assertTrue(result);
 		} catch (CustomSQLException e) {
 			e.printStackTrace();
@@ -105,9 +105,9 @@ public class EmployeePayRollTest {
 		EmployeePayRollService empPayRollService = new EmployeePayRollService();
 		try {
 			HashMap<String,Double> output = empPayRollService.getMinMaxSumAvgCount();
-			boolean result = output.get("minMale").equals(50000.0) && output.get("maxMale").equals(130000.0) && output.get("sumMale").equals(450000.0) && 
-					output.get("avgMale").equals(90000.0) && output.get("minFemale").equals(90000.0) && output.get("sumFemale").equals(90000.0)&& 
-					output.get("countMale").equals(5.0) && output.get("countFemale").equals(1.0);
+			boolean result = output.get("minMale").equals(60000.0) && output.get("maxMale").equals(200000.0) && output.get("sumMale").equals(660000.0) && 
+					output.get("avgMale").equals(110000.0) && output.get("minFemale").equals(90000.0) && output.get("sumFemale").equals(90000.0)&& 
+					output.get("countMale").equals(6.0) && output.get("countFemale").equals(1.0);
 			Assert.assertTrue(result);
 		} catch (CustomSQLException e) {
 			e.printStackTrace();
@@ -135,12 +135,27 @@ public class EmployeePayRollTest {
 		EmployeePayRollService empPayRollService = new EmployeePayRollService();
 		try {
 			int entries = empPayRollService.readData("DB");
-			System.out.println(entries);
 			LocalDate startDate = LocalDate.parse("2016-11-04");
 			int companyId = 3;
 			String departmentName = "Sales";
-			empPayRollService.addEmployeeAndPayRoll("Strange","M",50000.0,companyId,departmentName,startDate);
+			empPayRollService.addEmployeeAndPayRoll("Strange","M",60000.0,companyId,departmentName,startDate);
 			boolean result = empPayRollService.checkDBInSyncWithList("Strange");
+			Assert.assertTrue(result);
+		} catch (CustomSQLException e) {
+			e.printStackTrace();
+		}			
+	}
+	
+	@Test
+	public void givenNewEmployee_WhenAddedWithPayrollDataNewERDiagram_ShouldSyncWithDB() {
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		try {
+			int entries = empPayRollService.readData("DB");
+			LocalDate startDate = LocalDate.parse("2019-01-29");
+			int companyId = 4;
+			String departmentName = "Sales";
+			empPayRollService.addEmployeeAndPayRoll("Tchalla","M",200000.0,companyId,departmentName,startDate);
+			boolean result = empPayRollService.checkDBInSyncWithList("Tchalla");
 			Assert.assertTrue(result);
 		} catch (CustomSQLException e) {
 			e.printStackTrace();
