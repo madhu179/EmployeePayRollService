@@ -135,6 +135,7 @@ public class EmployeePayRollTest {
 		EmployeePayRollService empPayRollService = new EmployeePayRollService();
 		try {
 			int entries = empPayRollService.readData("DB");
+			System.out.println(entries);
 			LocalDate startDate = LocalDate.parse("2016-11-04");
 			int companyId = 3;
 			String departmentName = "Sales";
