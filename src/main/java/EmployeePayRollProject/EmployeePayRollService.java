@@ -41,7 +41,7 @@ public class EmployeePayRollService {
 		empPayRollList.add(empPayRollObject);
 	}
 
-	public int readData(String source) {
+	public int readData(String source) throws CustomSQLException {
 		if (source.equals("File")) {
 			empPayRollList = new EmployeePayRollFileService().readData();
 			return empPayRollList.size();
@@ -52,7 +52,7 @@ public class EmployeePayRollService {
 		return 0;
 	}
 
-	public void updateSalary(int n, String name, Double salary) {
+	public void updateSalary(int n, String name, Double salary) throws CustomSQLException {
 		int success = employeePayRollDBService.updateSalary(n, name, salary);
 		if (success == 1) {
 			for (EmployeePayRoll e : empPayRollList) {
@@ -88,7 +88,7 @@ public class EmployeePayRollService {
 
 	}
 
-	public boolean checkDBInSyncWithList(String name) {
+	public boolean checkDBInSyncWithList(String name) throws CustomSQLException {
 		EmployeePayRoll employeeDB = employeePayRollDBService.getEmployee(name);
 		EmployeePayRoll employeeList = getEmployee(name);
 		return employeeDB.equals(employeeList);
@@ -98,15 +98,15 @@ public class EmployeePayRollService {
 		return empPayRollList.stream().filter(e -> e.getName().equals(name)).findFirst().orElse(null);
 	}
 
-	public EmployeePayRoll preparedStatementReadData(String name) {
+	public EmployeePayRoll preparedStatementReadData(String name) throws CustomSQLException {
 		return employeePayRollDBService.preparedStatementReadData(name);
 	}
 
-	public List<EmployeePayRoll> getDataInDateRange(String startDate, String endDate) {
+	public List<EmployeePayRoll> getDataInDateRange(String startDate, String endDate) throws CustomSQLException {
 		return employeePayRollDBService.getDataInDateRange(startDate,endDate);
 	}
 
-	public HashMap<String,Double> getMinMaxSumAvgCount() {
+	public HashMap<String,Double> getMinMaxSumAvgCount() throws CustomSQLException {
 		return employeePayRollDBService.getMinMaxSumAvgCount();
 	}
 

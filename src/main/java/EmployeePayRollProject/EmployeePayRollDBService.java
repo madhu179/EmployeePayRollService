@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +26,7 @@ public class EmployeePayRollDBService {
 		return employeePayRollDBService;
 	}
 
-	public List<EmployeePayRoll> readData() {
+	public List<EmployeePayRoll> readData() throws CustomSQLException {
 		List<EmployeePayRoll> employeePayRollList = new ArrayList<EmployeePayRoll>();
 		String query = "select * from employee_payroll";
 		Statement statement;
@@ -37,19 +36,19 @@ public class EmployeePayRollDBService {
 			result = statement.executeQuery(query);
 			employeePayRollList = getDatafromResultset(result);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new CustomSQLException(e.getMessage(),CustomSQLException.Exception_Type.READ_FAILED);
 		}
 		return employeePayRollList;
 	}
 
-	public int updateSalary(int n, String name, Double salary) {
+	public int updateSalary(int n, String name, Double salary) throws CustomSQLException {
 		if (n == 1)
 			return this.updateSalaryUsingStatement(name, salary);
 		else
 			return this.updateSalaryUsingPreparedStatement(name, salary);
 	}
 
-	private int updateSalaryUsingPreparedStatement(String name, Double salary) {
+	private int updateSalaryUsingPreparedStatement(String name, Double salary) throws CustomSQLException {
 		try (Connection connection = this.getConnection();) {
 			preparedStatement = connection
 					.prepareStatement("update employee_payroll set salary = ? where name = ?");
@@ -58,12 +57,11 @@ public class EmployeePayRollDBService {
 			int result = preparedStatement.executeUpdate();
 			return result;
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new CustomSQLException(e.getMessage(),CustomSQLException.Exception_Type.UPDATE_FAILED);
 		}
-		return 0;
 	}
 
-	private int updateSalaryUsingStatement(String name, Double salary) {
+	private int updateSalaryUsingStatement(String name, Double salary) throws CustomSQLException {
 		String query = String.format("update employee_payroll set salary = %.2f where name = '%s' ;", salary, name);
 		Statement statement;
 		int result = 0;
@@ -72,12 +70,11 @@ public class EmployeePayRollDBService {
 			result = statement.executeUpdate(query);
 			return result;
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new CustomSQLException(e.getMessage(),CustomSQLException.Exception_Type.UPDATE_FAILED);
 		}
-		return 0;
 	}
 	
-	public EmployeePayRoll preparedStatementReadData(String name) {	
+	public EmployeePayRoll preparedStatementReadData(String name) throws CustomSQLException {	
 		List<EmployeePayRoll> employeePayRollList = new ArrayList<EmployeePayRoll>();
 		try (Connection connection = this.getConnection();) {
 			preparedStatement = connection
@@ -87,12 +84,11 @@ public class EmployeePayRollDBService {
 			employeePayRollList = getDatafromResultset(result);
 			return employeePayRollList.get(0);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new CustomSQLException(e.getMessage(),CustomSQLException.Exception_Type.READ_FAILED);
 		}
-		return null;
 	}
 	
-	public List<EmployeePayRoll> getDataInDateRange(String startDate, String endDate) {
+	public List<EmployeePayRoll> getDataInDateRange(String startDate, String endDate) throws CustomSQLException {
 		List<EmployeePayRoll> employeePayRollList = new ArrayList<EmployeePayRoll>();
 		try (Connection connection = this.getConnection();) {
 			preparedStatement = connection
@@ -103,12 +99,11 @@ public class EmployeePayRollDBService {
 			employeePayRollList = getDatafromResultset(result);
 			return employeePayRollList;
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new CustomSQLException(e.getMessage(),CustomSQLException.Exception_Type.READ_IN_DATERANGE_FAILED);
 		}
-		return null;
 	}
 	
-	public HashMap<String, Double> getMinMaxSumAvgCount() {
+	public HashMap<String, Double> getMinMaxSumAvgCount() throws CustomSQLException {
 		HashMap<String,Double> functionMap = new HashMap<String,Double>();
 		List<Double> min = getDataBasedOnQuery("select min(salary),gender from employee_payroll group by gender");
 		List<Double> max = getDataBasedOnQuery("select max(salary),gender from employee_payroll group by gender");
@@ -128,7 +123,7 @@ public class EmployeePayRollDBService {
 		return functionMap;
 	}
 	
-	public List<Double>  getDataBasedOnQuery(String query) {
+	public List<Double>  getDataBasedOnQuery(String query) throws CustomSQLException {
 		List<Double> functionList = new ArrayList<Double>();
 		Statement statement;
 		ResultSet result;
@@ -143,12 +138,11 @@ public class EmployeePayRollDBService {
 			}
 			return functionList;
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new CustomSQLException(e.getMessage(),CustomSQLException.Exception_Type.QUERY_FAILED);
 		}
-		return null;
 	}
 
-	private Connection getConnection() {
+	private Connection getConnection() throws CustomSQLException {
 		String jdbcURL = "jdbc:mysql://localhost:3306/employee_payroll_service?useSSL=false";
 		String userName = "root";
 		String password = "Fightclub@8.8";
@@ -156,12 +150,12 @@ public class EmployeePayRollDBService {
 		try {
 			connection = DriverManager.getConnection(jdbcURL, userName, password);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new CustomSQLException(e.getMessage(),CustomSQLException.Exception_Type.CONNECTION_FAILED);
 		}
 		return connection;
 	}
 
-	public EmployeePayRoll getEmployee(String name) {
+	public EmployeePayRoll getEmployee(String name) throws CustomSQLException {
 		List<EmployeePayRoll> employeePayRollList = new ArrayList<EmployeePayRoll>();
 		employeePayRollList = this.readData();
 		return employeePayRollList.stream()
@@ -170,7 +164,7 @@ public class EmployeePayRollDBService {
 				.orElse(null);
 	}
 	
-	public List<EmployeePayRoll> getDatafromResultset(ResultSet result)
+	public List<EmployeePayRoll> getDatafromResultset(ResultSet result) throws CustomSQLException
 	{
 		List<EmployeePayRoll> employeePayRollList = new ArrayList<EmployeePayRoll>();
 		try {
@@ -180,7 +174,7 @@ public class EmployeePayRollDBService {
 									result.getDouble("salary"), result.getDate("startdate").toLocalDate()));
 				} 
 			}catch (SQLException e) {
-				e.printStackTrace();
+				throw new CustomSQLException(e.getMessage(),CustomSQLException.Exception_Type.READ_FAILED);
 			}
 		return employeePayRollList;		
 	}
