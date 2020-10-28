@@ -163,6 +163,43 @@ public class EmployeePayRollDBService {
 			throw new CustomSQLException(e.getMessage(),CustomSQLException.Exception_Type.ADD_FAILED);
 		}
 	}
+	
+public EmployeePayRoll addEmployeeAndPayRoll(String name, String gender, double salary, LocalDate startDate) throws CustomSQLException {
+	int employeeId = 0;
+	EmployeePayRoll employee = null;
+	String query = String.format("insert into employee_payroll(name,gender,salary,startdate) "
+			+ "values('%s','%s',%s,'%s')",name,gender,salary,startDate);
+	Connection connection = this.getConnection();
+	try(Statement statement = connection.createStatement();)  {	
+		int rowAffected = statement.executeUpdate(query,statement.RETURN_GENERATED_KEYS);
+		if(rowAffected==1)
+		{
+			ResultSet result = statement.getGeneratedKeys();
+			if(result.next())
+				employeeId = result.getInt(1);
+		}
+	} catch (SQLException e) {
+		throw new CustomSQLException(e.getMessage(),CustomSQLException.Exception_Type.ADD_FAILED);
+	}
+	
+	try (Statement statement = connection.createStatement();) {
+		double basic_pay = salary;
+		double deductions = salary*0.2;
+		double taxablePay = salary-deductions;
+		double tax = taxablePay*0.1;
+		double netPay = salary-tax;
+		 query = String.format("insert into payroll_details(emp_id,basic_pay,deductions,taxable_pay,tax,net_pay) "
+				+ "values(%s,%s,%s,%s,%s,%s)",employeeId,basic_pay,deductions,taxablePay,tax,netPay);
+		int rowAffected = statement.executeUpdate(query);
+		if(rowAffected==1)
+		{
+			employee = new EmployeePayRoll(employeeId,name,salary,startDate);
+		}
+	} catch (SQLException e) {
+		throw new CustomSQLException(e.getMessage(),CustomSQLException.Exception_Type.ADD_FAILED);
+	}
+	return employee;
+	}
 
 	private Connection getConnection() throws CustomSQLException {
 		String jdbcURL = "jdbc:mysql://localhost:3306/employee_payroll_service?useSSL=false";
