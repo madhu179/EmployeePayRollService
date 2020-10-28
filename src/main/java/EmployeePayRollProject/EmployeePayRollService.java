@@ -110,4 +110,8 @@ public class EmployeePayRollService {
 		return employeePayRollDBService.getMinMaxSumAvgCount();
 	}
 
+	public void addEmployee(String name, String gender, double salary, LocalDate startDate) throws CustomSQLException {
+		empPayRollList.add(employeePayRollDBService.addEmployee(name,gender,salary,startDate));
+	}
+
 }

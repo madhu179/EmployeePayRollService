@@ -39,7 +39,7 @@ public class EmployeePayRollTest {
 		int entries;
 		try {
 			entries = empPayRollService.readData("DB");
-			boolean result = entries == 4 ? true : false;
+			boolean result = entries == 5 ? true : false;
 			Assert.assertTrue(result);
 		} catch (CustomSQLException e) {
 			e.printStackTrace();
@@ -108,9 +108,23 @@ public class EmployeePayRollTest {
 		try {
 			int entries = empPayRollService.readData("DB");
 			HashMap<String,Double> output = empPayRollService.getMinMaxSumAvgCount();
-			boolean result = output.get("minMale").equals(70000.0) && output.get("maxMale").equals(130000.0) && output.get("sumMale").equals(300000.0) && 
+			boolean result = output.get("minMale").equals(70000.0) && output.get("maxMale").equals(130000.0) && output.get("sumMale").equals(400000.0) && 
 					output.get("avgMale").equals(100000.0) && output.get("minFemale").equals(90000.0) && output.get("sumFemale").equals(90000.0)&& 
-					output.get("countMale").equals(3.0) && output.get("countFemale").equals(1.0);
+					output.get("countMale").equals(4.0) && output.get("countFemale").equals(1.0);
+			Assert.assertTrue(result);
+		} catch (CustomSQLException e) {
+			e.printStackTrace();
+		}			
+	}
+	
+	@Test
+	public void givenNewEmployee_WhenAdded_ShouldSyncWithDB() {
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		try {
+			int entries = empPayRollService.readData("DB");
+			LocalDate startDate = LocalDate.parse("2008-09-01");
+			empPayRollService.addEmployee("Bruce","M",100000.0,startDate);
+			boolean result = empPayRollService.checkDBInSyncWithList("Bruce");
 			Assert.assertTrue(result);
 		} catch (CustomSQLException e) {
 			e.printStackTrace();

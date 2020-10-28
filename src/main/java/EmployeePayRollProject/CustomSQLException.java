@@ -5,6 +5,7 @@ public class CustomSQLException extends Exception {
 	enum Exception_Type{
 		CONNECTION_FAILED,
 		QUERY_FAILED,
+		ADD_FAILED,
 		READ_FAILED,
 		UPDATE_FAILED,
 		READ_IN_DATERANGE_FAILED

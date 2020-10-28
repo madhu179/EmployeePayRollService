@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -139,6 +140,27 @@ public class EmployeePayRollDBService {
 			return functionList;
 		} catch (SQLException e) {
 			throw new CustomSQLException(e.getMessage(),CustomSQLException.Exception_Type.QUERY_FAILED);
+		}
+	}
+	
+	public EmployeePayRoll addEmployee(String name, String gender, double salary, LocalDate startDate) throws CustomSQLException {
+		int employeeId = 0;
+		EmployeePayRoll employee = null;
+		String query = String.format("insert into employee_payroll(name,gender,salary,startdate) "
+				+ "values('%s','%s',%s,'%s')",name,gender,salary,startDate);
+		try (Connection connection = this.getConnection();) {
+			Statement statement = connection.createStatement();
+			int rowAffected = statement.executeUpdate(query,statement.RETURN_GENERATED_KEYS);
+			if(rowAffected==1)
+			{
+				ResultSet result = statement.getGeneratedKeys();
+				if(result.next())
+					employeeId = result.getInt(1);
+			}
+			employee = new EmployeePayRoll(employeeId,name,salary,startDate);
+			return employee;
+		} catch (SQLException e) {
+			throw new CustomSQLException(e.getMessage(),CustomSQLException.Exception_Type.ADD_FAILED);
 		}
 	}
 
