@@ -161,5 +161,22 @@ public class EmployeePayRollTest {
 			e.printStackTrace();
 		}			
 	}
+	
+	@Test
+	public void givenEmployeeName_ShouldRemoveFromListAndDB() {
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		List<EmployeePayRoll> empPayRoll = new ArrayList<EmployeePayRoll>();
+		try {
+			int entries = empPayRollService.readData("DB");
+			System.out.println("before "+entries);
+			empPayRollService.deleteEmployee("Strange");
+			int entrie = empPayRollService.readData("DB");
+			System.out.println("after "+entrie);
+			boolean result = empPayRollService.checkIFDeletedFromList("Strange");	
+			Assert.assertFalse(result);
+		} catch (CustomSQLException e) {
+			e.printStackTrace();
+		}			
+	}
 
 }
