@@ -116,8 +116,8 @@ public class EmployeePayRollService {
 		empPayRollList.add(employee);
 	}
 
-	public void addEmployeeAndPayRoll(String name, String gender, double salary, LocalDate startDate) throws CustomSQLException {
-		EmployeePayRoll employee = employeePayRollDBService.addEmployeeAndPayRoll(name,gender,salary,startDate);
+	public void addEmployeeAndPayRoll(String name, String gender, double salary, int companyId, String departmentName, LocalDate startDate) throws CustomSQLException {
+		EmployeePayRoll employee = employeePayRollDBService.addEmployeeAndPayRoll(name,gender,salary,companyId,departmentName,startDate);
 		if(employee != null)
 			empPayRollList.add(employee);
 	}

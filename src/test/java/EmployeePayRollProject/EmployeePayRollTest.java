@@ -80,7 +80,7 @@ public class EmployeePayRollTest {
 		try {
 			int entries = empPayRollService.readData("DB");
 			employee = empPayRollService.preparedStatementReadData("Natasha");
-			boolean result = employee.getStartDate().equals(startDate);
+			boolean result = employee.getStartDate().contains(startDate);
 			Assert.assertTrue(result);
 		} catch (CustomSQLException e) {
 			e.printStackTrace();
@@ -89,11 +89,9 @@ public class EmployeePayRollTest {
 	
 	@Test
 	public void giveDateRange_RetreiveDataFromDB_UsingPreparedStatement_ShouldMatch() {
-		EmployeePayRoll employee;
 		List<EmployeePayRoll> empPayRoll = new ArrayList<EmployeePayRoll>();
 		EmployeePayRollService empPayRollService = new EmployeePayRollService();
 		try {
-			int entries = empPayRollService.readData("DB");
 			empPayRoll = empPayRollService.getDataInDateRange("2010-04-29","2018-04-29");
 			boolean result = empPayRoll.size()==3;
 			Assert.assertTrue(result);
@@ -106,7 +104,6 @@ public class EmployeePayRollTest {
 	public void findMinMaxSumAvgcount_GroupedByGender_ShouldMatch() {
 		EmployeePayRollService empPayRollService = new EmployeePayRollService();
 		try {
-			int entries = empPayRollService.readData("DB");
 			HashMap<String,Double> output = empPayRollService.getMinMaxSumAvgCount();
 			boolean result = output.get("minMale").equals(50000.0) && output.get("maxMale").equals(130000.0) && output.get("sumMale").equals(450000.0) && 
 					output.get("avgMale").equals(90000.0) && output.get("minFemale").equals(90000.0) && output.get("sumFemale").equals(90000.0)&& 
@@ -123,7 +120,9 @@ public class EmployeePayRollTest {
 		try {
 			int entries = empPayRollService.readData("DB");
 			LocalDate startDate = LocalDate.parse("2008-09-01");
-			empPayRollService.addEmployeeAndPayRoll("Bruce","M",100000.0,startDate);
+			int companyId = 3;
+			String departmentName = "Management";
+			empPayRollService.addEmployeeAndPayRoll("Bruce","M",100000.0,companyId,departmentName,startDate);
 			boolean result = empPayRollService.checkDBInSyncWithList("Bruce");
 			Assert.assertTrue(result);
 		} catch (CustomSQLException e) {
@@ -137,7 +136,9 @@ public class EmployeePayRollTest {
 		try {
 			int entries = empPayRollService.readData("DB");
 			LocalDate startDate = LocalDate.parse("2016-11-04");
-			empPayRollService.addEmployeeAndPayRoll("Strange","M",50000.0,startDate);
+			int companyId = 3;
+			String departmentName = "Sales";
+			empPayRollService.addEmployeeAndPayRoll("Strange","M",50000.0,companyId,departmentName,startDate);
 			boolean result = empPayRollService.checkDBInSyncWithList("Strange");
 			Assert.assertTrue(result);
 		} catch (CustomSQLException e) {

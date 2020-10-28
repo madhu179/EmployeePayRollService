@@ -1,13 +1,16 @@
 package EmployeePayRollProject;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class EmployeePayRoll {
 
 	private int id;
 	private String name;
 	private double salary;
-	private LocalDate startDate;
+	private int companyId;
+	private List<String> departmentName;
+	private List<LocalDate> startDate;
 
 	public EmployeePayRoll(int id, String name, double salary) {
 		this.id = id;
@@ -15,8 +18,11 @@ public class EmployeePayRoll {
 		this.salary = salary;
 	}
 	
-	public EmployeePayRoll(int id, String name, double salary, LocalDate startDate) {
+	public EmployeePayRoll(int id, String name, double salary, int companyId, List<String> departmentName,
+			List<LocalDate> startDate) {
 		this(id,name,salary);
+		this.companyId = companyId;
+		this.departmentName = departmentName;
 		this.startDate = startDate;
 	}
 
@@ -44,18 +50,34 @@ public class EmployeePayRoll {
 		this.salary = salary;
 	}
 
-	public LocalDate getStartDate() {
-		return startDate;
-	}
-
-	public void setStartDate(LocalDate startDate) {
-		this.startDate = startDate;
-	}
-
 	public String toString() {
 		return "id=" + id + ", name=" + name + ", salary=" + salary;
 	}
 	
+	public int getCompanyId() {
+		return companyId;
+	}
+
+	public void setCompanyId(int companyId) {
+		this.companyId = companyId;
+	}
+
+	public List<String> getDepartmentName() {
+		return departmentName;
+	}
+
+	public void setDepartmentName(List<String> departmentName) {
+		this.departmentName = departmentName;
+	}
+
+	public List<LocalDate> getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(List<LocalDate> startDate) {
+		this.startDate = startDate;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -65,6 +87,13 @@ public class EmployeePayRoll {
 		if (getClass() != obj.getClass())
 			return false;
 		EmployeePayRoll other = (EmployeePayRoll) obj;
+		if (companyId != other.companyId)
+			return false;
+		if (departmentName == null) {
+			if (other.departmentName != null)
+				return false;
+		} else if (!departmentName.equals(other.departmentName))
+			return false;
 		if (id != other.id)
 			return false;
 		if (name == null) {
