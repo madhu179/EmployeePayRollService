@@ -169,8 +169,15 @@ public EmployeePayRoll addEmployeeAndPayRoll(String name, String gender, double 
 	EmployeePayRoll employee = null;
 	String query = String.format("insert into employee_payroll(name,gender,salary,startdate) "
 			+ "values('%s','%s',%s,'%s')",name,gender,salary,startDate);
-	Connection connection = this.getConnection();
+	Connection connection = null;
+	try {
+		connection = this.getConnection();
+		connection.setAutoCommit(false);
+	} catch (SQLException e2) {
+		e2.printStackTrace();
+	}
 	try(Statement statement = connection.createStatement();)  {	
+		
 		int rowAffected = statement.executeUpdate(query,statement.RETURN_GENERATED_KEYS);
 		if(rowAffected==1)
 		{
@@ -179,6 +186,12 @@ public EmployeePayRoll addEmployeeAndPayRoll(String name, String gender, double 
 				employeeId = result.getInt(1);
 		}
 	} catch (SQLException e) {
+		try {
+			connection.rollback();
+			return employee;
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
 		throw new CustomSQLException(e.getMessage(),CustomSQLException.Exception_Type.ADD_FAILED);
 	}
 	
@@ -196,7 +209,25 @@ public EmployeePayRoll addEmployeeAndPayRoll(String name, String gender, double 
 			employee = new EmployeePayRoll(employeeId,name,salary,startDate);
 		}
 	} catch (SQLException e) {
+		try {
+			connection.rollback();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
 		throw new CustomSQLException(e.getMessage(),CustomSQLException.Exception_Type.ADD_FAILED);
+	}
+		try {
+			connection.commit();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+	}finally
+	{
+		if(connection!=null)
+			try {
+				connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 	}
 	return employee;
 	}
