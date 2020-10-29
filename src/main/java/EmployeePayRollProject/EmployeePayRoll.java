@@ -5,12 +5,13 @@ import java.util.List;
 
 public class EmployeePayRoll {
 
-	private int id;
-	private String name;
-	private double salary;
-	private int companyId;
-	private List<String> departmentName;
-	private List<LocalDate> startDate;
+	public int id;
+	public String name;
+	public double salary;
+	public int companyId;
+	public String gender;
+	public List<String> departmentName;
+	public List<LocalDate> startDate;
 
 	public EmployeePayRoll(int id, String name, double salary) {
 		this.id = id;
@@ -18,9 +19,10 @@ public class EmployeePayRoll {
 		this.salary = salary;
 	}
 	
-	public EmployeePayRoll(int id, String name, double salary, int companyId, List<String> departmentName,
+	public EmployeePayRoll(int id, String name,String gender ,double salary, int companyId, List<String> departmentName,
 			List<LocalDate> startDate) {
 		this(id,name,salary);
+		this.gender = gender;
 		this.companyId = companyId;
 		this.departmentName = departmentName;
 		this.startDate = startDate;
@@ -77,6 +79,14 @@ public class EmployeePayRoll {
 	public void setStartDate(List<LocalDate> startDate) {
 		this.startDate = startDate;
 	}
+	
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -93,6 +103,11 @@ public class EmployeePayRoll {
 			if (other.departmentName != null)
 				return false;
 		} else if (!departmentName.equals(other.departmentName))
+			return false;
+		if (gender == null) {
+			if (other.gender != null)
+				return false;
+		} else if (!gender.equals(other.gender))
 			return false;
 		if (id != other.id)
 			return false;

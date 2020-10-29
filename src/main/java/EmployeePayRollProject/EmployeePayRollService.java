@@ -116,7 +116,7 @@ public class EmployeePayRollService {
 		empPayRollList.add(employee);
 	}
 
-	public void addEmployeeAndPayRoll(String name, String gender, double salary, int companyId, String departmentName, LocalDate startDate) throws CustomSQLException {
+	public void addEmployeeAndPayRoll(String name, String gender, double salary, int companyId, List<String> departmentName, List<LocalDate> startDate) throws CustomSQLException {
 		EmployeePayRoll employee = employeePayRollDBService.addEmployeeAndPayRoll(name,gender,salary,companyId,departmentName,startDate);
 		if(employee != null)
 			empPayRollList.add(employee);
@@ -138,6 +138,21 @@ public class EmployeePayRollService {
 			}
 		}
 		return result;
+	}
+
+	public int addEmployeeAndPayRoll(List<EmployeePayRoll> employeeList)  {
+		
+		employeeList.forEach(e->{
+			System.out.println("Employee adding : "+e.getName());
+			try {
+				this.addEmployeeAndPayRoll(e.name,e.gender,e.salary,e.companyId,e.departmentName,e.startDate);
+			} catch (CustomSQLException e1) {
+				e1.printStackTrace();
+			}
+			System.out.println("Employee added : "+e.getName());
+		});
+		System.out.println(empPayRollList.size());
+		return empPayRollList.size();
 	}
 
 }

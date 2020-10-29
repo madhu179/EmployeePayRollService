@@ -162,7 +162,9 @@ public class EmployeePayRollDBService {
 	}
 
 	public EmployeePayRoll addEmployeeAndPayRoll(String name, String gender, double salary, int companyId,
-			String departmentName, LocalDate startDate) throws CustomSQLException {
+			List<String> departments, List<LocalDate> dates) throws CustomSQLException {
+		String departmentName = departments.get(0);
+		LocalDate startDate = dates.get(0);
 		int employeeId = 0;
 		EmployeePayRoll employee = null;
 		String query = String.format(
@@ -236,7 +238,7 @@ public class EmployeePayRollDBService {
 				departmentNameList.add(departmentName);
 				List<LocalDate> startDates = new ArrayList<LocalDate>();
 				startDates.add(startDate);
-				employee = new EmployeePayRoll(employeeId, name, salary, companyId, departmentNameList, startDates);
+				employee = new EmployeePayRoll(employeeId, name, gender,salary, companyId, departmentNameList, startDates);
 			}
 		} catch (SQLException e) {
 			try {
@@ -333,7 +335,7 @@ public class EmployeePayRollDBService {
 					}
 				}
 				employeePayRollList.add(new EmployeePayRoll(result.getInt("id"), result.getString("name"),
-						result.getDouble("salary"), result.getInt("company_id"), department_name, startDates));
+						result.getString("gender"),result.getDouble("salary"), result.getInt("company_id"), department_name, startDates));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
