@@ -216,6 +216,7 @@ public class EmployeePayRollTest {
 		EmployeePayRollService empPayRollService = new EmployeePayRollService();
 		try {
 			int entries = empPayRollService.readData("DB");
+			System.out.println("Entries" + entries);
 			String departmentName = "Management";
 			EmployeePayRoll[] employeeArray = {
 					new EmployeePayRoll(0, "Tony", "M", 130000.0, 3, Arrays.asList(departmentName),
@@ -233,7 +234,7 @@ public class EmployeePayRollTest {
 			Instant startThread = Instant.now();
 			int countOfEntries = empPayRollService.addEmployeeAndPayRollWithThread(Arrays.asList(employeeArray));
 			Instant endThread = Instant.now();
-			System.out.println("Duration with Thread : " + Duration.between(startThread, endThread));
+			System.out.println("Duration with Thread : " + Duration.between(startThread, endThread));			
 			boolean result = countOfEntries == 11 ? true : false;
 			Assert.assertTrue(result);
 		} catch (CustomSQLException e) {

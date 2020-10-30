@@ -14,6 +14,7 @@ import java.util.List;
 
 public class EmployeePayRollDBService {
 
+	private int connectionCounter=0;
 	private PreparedStatement preparedStatement;
 
 	private static EmployeePayRollDBService employeePayRollDBService;
@@ -287,15 +288,18 @@ public class EmployeePayRollDBService {
 	}
 
 	private Connection getConnection() throws CustomSQLException {
+		connectionCounter += 1; 
 		String jdbcURL = "jdbc:mysql://localhost:3306/employee_payroll_service?useSSL=false";
 		String userName = "root";
 		String password = "Fightclub@8.8";
+		System.out.println("Processing Thread : "+Thread.currentThread().getName()+" with Id : "+connectionCounter);
 		Connection connection = null;
 		try {
 			connection = DriverManager.getConnection(jdbcURL, userName, password);
 		} catch (SQLException e) {
 			throw new CustomSQLException(e.getMessage(), CustomSQLException.Exception_Type.CONNECTION_FAILED);
 		}
+		System.out.println("Processing Thread : "+Thread.currentThread().getName()+" with Id : "+connectionCounter+" "+connection+" Connection Successfully Established");
 		return connection;
 	}
 
