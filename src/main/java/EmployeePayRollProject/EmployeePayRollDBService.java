@@ -14,7 +14,7 @@ import java.util.List;
 
 public class EmployeePayRollDBService {
 
-	private int connectionCounter=0;
+	private int connectionCounter = 0;
 	private PreparedStatement preparedStatement;
 
 	private static EmployeePayRollDBService employeePayRollDBService;
@@ -52,7 +52,8 @@ public class EmployeePayRollDBService {
 
 	private int updateSalaryUsingPreparedStatement(String name, Double salary) throws CustomSQLException {
 		try (Connection connection = this.getConnection();) {
-			preparedStatement = connection.prepareStatement("update employee_payroll set salary = ? where name = ? and is_active = true");
+			preparedStatement = connection
+					.prepareStatement("update employee_payroll set salary = ? where name = ? and is_active = true");
 			preparedStatement.setDouble(1, salary);
 			preparedStatement.setString(2, name);
 			int result = preparedStatement.executeUpdate();
@@ -63,7 +64,8 @@ public class EmployeePayRollDBService {
 	}
 
 	private int updateSalaryUsingStatement(String name, Double salary) throws CustomSQLException {
-		String query = String.format("update employee_payroll set salary = %.2f where name = '%s' and is_active = true ;", salary, name);
+		String query = String.format(
+				"update employee_payroll set salary = %.2f where name = '%s' and is_active = true ;", salary, name);
 		Statement statement;
 		int result = 0;
 		try (Connection connection = this.getConnection();) {
@@ -78,7 +80,8 @@ public class EmployeePayRollDBService {
 	public EmployeePayRoll preparedStatementReadData(String name) throws CustomSQLException {
 		List<EmployeePayRoll> employeePayRollList = new ArrayList<EmployeePayRoll>();
 		try (Connection connection = this.getConnection();) {
-			preparedStatement = connection.prepareStatement("select * from  employee_payroll where name = ? and is_active = true");
+			preparedStatement = connection
+					.prepareStatement("select * from  employee_payroll where name = ? and is_active = true");
 			preparedStatement.setString(1, name);
 			ResultSet result = preparedStatement.executeQuery();
 			employeePayRollList = getDatafromResultset(result);
@@ -105,11 +108,16 @@ public class EmployeePayRollDBService {
 
 	public HashMap<String, Double> getMinMaxSumAvgCount() throws CustomSQLException {
 		HashMap<String, Double> functionMap = new HashMap<String, Double>();
-		List<Double> min = getDataBasedOnQuery("select min(salary),gender from employee_payroll where is_active = true group by gender");
-		List<Double> max = getDataBasedOnQuery("select max(salary),gender from employee_payroll where is_active = true group by gender");
-		List<Double> sum = getDataBasedOnQuery("select sum(salary),gender from employee_payroll where is_active = true group by gender");
-		List<Double> avg = getDataBasedOnQuery("select avg(salary),gender from employee_payroll where is_active = true group by gender;");
-		List<Double> count = getDataBasedOnQuery("select count(*),gender from employee_payroll where is_active = true group by gender;");
+		List<Double> min = getDataBasedOnQuery(
+				"select min(salary),gender from employee_payroll where is_active = true group by gender");
+		List<Double> max = getDataBasedOnQuery(
+				"select max(salary),gender from employee_payroll where is_active = true group by gender");
+		List<Double> sum = getDataBasedOnQuery(
+				"select sum(salary),gender from employee_payroll where is_active = true group by gender");
+		List<Double> avg = getDataBasedOnQuery(
+				"select avg(salary),gender from employee_payroll where is_active = true group by gender;");
+		List<Double> count = getDataBasedOnQuery(
+				"select count(*),gender from employee_payroll where is_active = true group by gender;");
 		functionMap.put("minMale", min.get(0));
 		functionMap.put("minFemale", min.get(1));
 		functionMap.put("maxMale", max.get(0));
@@ -162,58 +170,11 @@ public class EmployeePayRollDBService {
 		}
 	}
 
-	public EmployeePayRoll addEmployeeAndPayRoll(String name, String gender, double salary, int companyId,
-			List<String> departments, List<LocalDate> dates) throws CustomSQLException {
-		String departmentName = departments.get(0);
-		LocalDate startDate = dates.get(0);
-		int employeeId = 0;
-		EmployeePayRoll employee = null;
+	private void insertIntoEmployeeDepartment(Connection connection, int employeeId, int departmentId,
+			LocalDate startDate) throws CustomSQLException {
 		String query = String.format(
-				"insert into employee_payroll(name,gender,salary,company_id) " + "values('%s','%s',%s,'%s')", name,
-				gender, salary, companyId);
-		Connection connection = null;
-		try {
-			connection = this.getConnection();
-			connection.setAutoCommit(false);
-		} catch (SQLException e2) {
-			e2.printStackTrace();
-		}
-		try (Statement statement = connection.createStatement();) {
-
-			int rowAffected = statement.executeUpdate(query, statement.RETURN_GENERATED_KEYS);
-			if (rowAffected == 1) {
-				ResultSet result = statement.getGeneratedKeys();
-				if (result.next())
-					employeeId = result.getInt(1);
-			}
-		} catch (SQLException e) {
-			try {
-				connection.rollback();
-				return employee;
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-			}
-			throw new CustomSQLException(e.getMessage(), CustomSQLException.Exception_Type.ADD_FAILED);
-		}
-
-		int departmentId = 0;
-		try {
-			query = String.format("select * from department where name = '%s'", departmentName);
-			Statement statement = connection.createStatement();
-			ResultSet result3 = statement.executeQuery(query);
-			while (result3.next()) {
-				departmentId = (result3.getInt("id"));
-			}
-		} catch (SQLException e2) {
-			try {
-				connection.rollback();
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-			}
-			throw new CustomSQLException(e2.getMessage(), CustomSQLException.Exception_Type.ADD_FAILED);
-		}
-		query = String.format("insert into employee_department(emp_id,dept_id,start_date) " + "values('%s',%s,'%s')",
-				employeeId, departmentId, startDate);
+				"insert into employee_department(emp_id,dept_id,start_date) " + "values('%s',%s,'%s')", employeeId,
+				departmentId, startDate);
 		try (Statement statement = connection.createStatement();) {
 			int rowAffected = statement.executeUpdate(query);
 		} catch (SQLException e) {
@@ -224,22 +185,22 @@ public class EmployeePayRollDBService {
 			}
 			throw new CustomSQLException(e.getMessage(), CustomSQLException.Exception_Type.ADD_FAILED);
 		}
+	}
 
+	private boolean insertIntoPayrollTable(Connection connection, double salary, int employeeId)
+			throws CustomSQLException {
 		try (Statement statement = connection.createStatement();) {
 			double basic_pay = salary;
 			double deductions = salary * 0.2;
 			double taxablePay = salary - deductions;
 			double tax = taxablePay * 0.1;
 			double netPay = salary - tax;
-			query = String.format("insert into payroll_details(emp_id,basic_pay,deductions,taxable_pay,tax,net_pay) "
-					+ "values(%s,%s,%s,%s,%s,%s)", employeeId, basic_pay, deductions, taxablePay, tax, netPay);
+			String query = String
+					.format("insert into payroll_details(emp_id,basic_pay,deductions,taxable_pay,tax,net_pay) "
+							+ "values(%s,%s,%s,%s,%s,%s)", employeeId, basic_pay, deductions, taxablePay, tax, netPay);
 			int rowAffected = statement.executeUpdate(query);
 			if (rowAffected == 1) {
-				List<String> departmentNameList = new ArrayList<String>();
-				departmentNameList.add(departmentName);
-				List<LocalDate> startDates = new ArrayList<LocalDate>();
-				startDates.add(startDate);
-				employee = new EmployeePayRoll(employeeId, name, gender,salary, companyId, departmentNameList, startDates);
+				return true;
 			}
 		} catch (SQLException e) {
 			try {
@@ -249,35 +210,134 @@ public class EmployeePayRollDBService {
 			}
 			throw new CustomSQLException(e.getMessage(), CustomSQLException.Exception_Type.ADD_FAILED);
 		}
+		return false;
+	}
+
+	public EmployeePayRoll addEmployeeAndPayRoll(String name, String gender, double salary, int companyId,
+			List<String> departments, List<LocalDate> dates) throws CustomSQLException {
+		HashMap<Integer, Boolean> additionStatus = new HashMap<Integer, Boolean>();
+		String departmentName = departments.get(0);
+		LocalDate startDate[] = { dates.get(0) };
+		Double[] salaryArray = { salary };
+		int employeeId[] = { 0 };
+		int departmentId[] = { 0 };
+		String query;
+		boolean[] outcome = { false };
+		EmployeePayRoll[] employee = new EmployeePayRoll[1];
+		Connection[] connection = new Connection[1];
 		try {
-			connection.commit();
+			connection[0] = this.getConnection();
+			connection[0].setAutoCommit(false);
+		} catch (SQLException e2) {
+			e2.printStackTrace();
+		}
+
+		query = String.format(
+				"insert into employee_payroll(name,gender,salary,company_id) " + "values('%s','%s',%s,'%s')", name,
+				gender, salary, companyId);
+		try (Statement statement = connection[0].createStatement();) {
+
+			int rowAffected = statement.executeUpdate(query, statement.RETURN_GENERATED_KEYS);
+			if (rowAffected == 1) {
+				ResultSet result = statement.getGeneratedKeys();
+				if (result.next()) {
+					employeeId[0] = result.getInt(1);
+				}
+			}
+		} catch (SQLException e) {
+			try {
+				connection[0].rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			throw new CustomSQLException(e.getMessage(), CustomSQLException.Exception_Type.ADD_FAILED);
+		}
+
+		try {
+			query = String.format("select * from department where name = '%s'", departmentName);
+			Statement statement = connection[0].createStatement();
+			ResultSet result3 = statement.executeQuery(query);
+			while (result3.next()) {
+				departmentId[0] = (result3.getInt("id"));
+			}
+		} catch (SQLException e2) {
+			try {
+				connection[0].rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			throw new CustomSQLException(e2.getMessage(), CustomSQLException.Exception_Type.ADD_FAILED);
+		}
+
+		additionStatus.put(1, false);
+
+		Runnable task1 = () -> {
+			try {
+				insertIntoEmployeeDepartment(connection[0], employeeId[0], departmentId[0], startDate[0]);
+				additionStatus.put(1, true);
+			} catch (CustomSQLException e) {
+				e.printStackTrace();
+			}
+		};
+		Thread thread1 = new Thread(task1, name + "3");
+		thread1.start();
+
+		additionStatus.put(2, false);
+
+		Runnable task2 = () -> {
+			try {
+				outcome[0] = insertIntoPayrollTable(connection[0], salaryArray[0], employeeId[0]);
+				if (outcome[0] == true) {
+					List<String> departmentNameList = new ArrayList<String>();
+					departmentNameList.add(departmentName);
+					List<LocalDate> startDates = new ArrayList<LocalDate>();
+					startDates.add(startDate[0]);
+					employee[0] = new EmployeePayRoll(employeeId[0], name, gender, salary, companyId,
+							departmentNameList, startDates);
+				}
+				additionStatus.put(2, true);
+			} catch (CustomSQLException e) {
+				e.printStackTrace();
+			}
+		};
+		Thread thread2 = new Thread(task2, name + "4");
+		thread2.start();
+
+		while (additionStatus.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		try {
+			connection[0].commit();
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		} finally {
-			if (connection != null)
+			if (connection[0] != null)
 				try {
-					connection.close();
+					connection[0].close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
 		}
-		return employee;
+		return employee[0];
 	}
-	
+
 	public List<EmployeePayRoll> deleteEmployee(String name) throws CustomSQLException {
 		List<EmployeePayRoll> employeePayRollList = new ArrayList<EmployeePayRoll>();
-		String query = String.format("update employee_payroll set is_active = false where name = '%s'",name);
+		String query = String.format("update employee_payroll set is_active = false where name = '%s'", name);
 		Statement statement;
 		int result = 0;
 		try (Connection connection = this.getConnection();) {
 			statement = connection.createStatement();
 			result = statement.executeUpdate(query);
 			employeePayRollList = readData();
-			for(int i = 0; i < employeePayRollList.size(); i++ )
-			{
+			for (int i = 0; i < employeePayRollList.size(); i++) {
 				EmployeePayRoll employee = employeePayRollList.get(i);
-				if(employee.getName().equals(name))
-				{
+				if (employee.getName().equals(name)) {
 					employeePayRollList.remove(employee);
 				}
 			}
@@ -288,18 +348,20 @@ public class EmployeePayRollDBService {
 	}
 
 	private synchronized Connection getConnection() throws CustomSQLException {
-		connectionCounter += 1; 
+		connectionCounter += 1;
 		String jdbcURL = "jdbc:mysql://localhost:3306/employee_payroll_service?useSSL=false";
 		String userName = "root";
 		String password = "Fightclub@8.8";
-		System.out.println("Processing Thread : "+Thread.currentThread().getName()+" with Id : "+connectionCounter);
+		System.out
+				.println("Processing Thread : " + Thread.currentThread().getName() + " with Id : " + connectionCounter);
 		Connection connection = null;
 		try {
 			connection = DriverManager.getConnection(jdbcURL, userName, password);
 		} catch (SQLException e) {
 			throw new CustomSQLException(e.getMessage(), CustomSQLException.Exception_Type.CONNECTION_FAILED);
 		}
-		System.out.println("Processing Thread : "+Thread.currentThread().getName()+" with Id : "+connectionCounter+" "+connection+" Connection Successfully Established");
+		System.out.println("Processing Thread : " + Thread.currentThread().getName() + " with Id : " + connectionCounter
+				+ " " + connection + " Connection Successfully Established");
 		return connection;
 	}
 
@@ -338,8 +400,9 @@ public class EmployeePayRollDBService {
 						}
 					}
 				}
-				employeePayRollList.add(new EmployeePayRoll(result.getInt("id"), result.getString("name"),
-						result.getString("gender"),result.getDouble("salary"), result.getInt("company_id"), department_name, startDates));
+				employeePayRollList.add(
+						new EmployeePayRoll(result.getInt("id"), result.getString("name"), result.getString("gender"),
+								result.getDouble("salary"), result.getInt("company_id"), department_name, startDates));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
