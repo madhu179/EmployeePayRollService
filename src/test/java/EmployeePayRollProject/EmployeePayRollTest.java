@@ -241,5 +241,23 @@ public class EmployeePayRollTest {
 			e.printStackTrace();
 		}
 	}
+	
+	@Test
+	public void givenUpdatedSalaries_UpdatingMultipleEmployeesinDB_UsingPreparedStatement_ShouldMatch() {
+		EmployeePayRollService empPayRollService = new EmployeePayRollService();
+		try {
+			int entries = empPayRollService.readData("DB");
+			HashMap<String,Double> salaryMap = new HashMap<String,Double>();
+			salaryMap.put("Tony",110000.0);
+			salaryMap.put("Steve",70000.0);
+			salaryMap.put("Peter",90000.0);
+			salaryMap.put("Natasha",40000.0);		
+			empPayRollService.updateMultipleSalary(salaryMap);
+			boolean result = empPayRollService.checkDBInSyncWithList("Natasha");
+			Assert.assertTrue(result);
+		} catch (CustomSQLException e) {
+			e.printStackTrace();
+		}
+	}
 
 }
