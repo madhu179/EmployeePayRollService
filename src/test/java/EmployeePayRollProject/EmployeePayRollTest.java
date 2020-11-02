@@ -282,6 +282,14 @@ public class EmployeePayRollTest {
 		return request.post("/employee_payroll");
 	}
 	
+	public EmployeePayRoll[] getEmployeeList()
+	{
+		Response response = RestAssured.get("/employee_payroll/");
+		System.out.println(response.asString());
+		EmployeePayRoll[] employees = new Gson().fromJson(response.asString(), EmployeePayRoll[].class);	
+		return employees;
+	}
+	
 	@Test
 	public void employeeWhenAdded_ShouldMatchCount()
 	{
@@ -341,6 +349,14 @@ public class EmployeePayRollTest {
 		Response  response = request.put("/employee_payroll/"+employeePayRoll.id);
 		int statusCode = response.getStatusCode();
 		Assert.assertEquals(200, statusCode);
+	}
+	
+	@Test
+	public void retreiveEmployees_FromJsonServer_ShouldMatchCount(){
+		EmployeePayRoll[] employees = getEmployeeList();
+		EmployeePayRollService empPayRollService = new EmployeePayRollService(Arrays.asList(employees));
+		int CountOfEntries = empPayRollService.noOfEntries("REST_IO");
+		Assert.assertEquals(4, CountOfEntries);
 	}
 
 }

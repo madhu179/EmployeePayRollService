@@ -71,7 +71,7 @@ public class EmployeePayRollService {
 	}
 
 	public int noOfEntries(String destination) {
-		if (destination.equals("Console"))
+		if (destination.equals("Console") || destination.equals("REST_IO"))
 			return empPayRollList.size();
 		else if (destination.equals("File"))
 			return new EmployeePayRollFileService().noOfEntries();
