@@ -54,7 +54,7 @@
     {
       "id": 4,
       "name": "Natasha",
-      "salary": 60000,
+      "salary": 80000,
       "companyId": 3,
       "gender": "F",
       "departmentName": [
