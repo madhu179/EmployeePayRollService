@@ -52,13 +52,20 @@ public class EmployeePayRollService {
 		return 0;
 	}
 
-	public void updateSalary(int n, String name, Double salary) throws CustomSQLException {
-		int success = employeePayRollDBService.updateSalary(n, name, salary);
-		if (success == 1) {
-			for (EmployeePayRoll e : empPayRollList) {
-				if (e.getName().equals(name)) {
-					e.setSalary(salary);
+	public void updateSalary(int n, String name, Double salary, String destination) throws CustomSQLException {
+		if (destination.equals("DB")) {
+			int success = employeePayRollDBService.updateSalary(n, name, salary);
+			if (success == 1) {
+				for (EmployeePayRoll e : empPayRollList) {
+					if (e.getName().equals(name)) {
+						e.setSalary(salary);
+					}
 				}
+			}
+		} else {
+			for (EmployeePayRoll e : empPayRollList) {
+				if (e.name.equals(name))
+					e.setSalary(salary);
 			}
 		}
 	}
@@ -120,8 +127,7 @@ public class EmployeePayRollService {
 			List<String> departmentName, List<LocalDate> startDate) throws CustomSQLException {
 		EmployeePayRoll employee = employeePayRollDBService.addEmployeeAndPayRoll(name, gender, salary, companyId,
 				departmentName, startDate);
-		if (employee != null)
-		{
+		if (employee != null) {
 			empPayRollList.add(employee);
 		}
 	}
@@ -141,23 +147,19 @@ public class EmployeePayRollService {
 		return result;
 	}
 
-	public int addEmployeeAndPayRoll(List<EmployeePayRoll> employeeList,String destination) {
-		if(destination.equals("DB"))
-		{
-		employeeList.forEach(e -> {
-			System.out.println("Employee adding : " + e.getName());
-			try {
-				this.addEmployeeAndPayRoll(e.name, e.gender, e.salary, e.companyId, e.departmentName, e.startDate);
-			} catch (CustomSQLException e1) {
-				e1.printStackTrace();
-			}
-			System.out.println("Employee added : " + e.getName());
-		});
-		}
-		else
-		{
-			for(EmployeePayRoll e : employeeList)
-			{
+	public int addEmployeeAndPayRoll(List<EmployeePayRoll> employeeList, String destination) {
+		if (destination.equals("DB")) {
+			employeeList.forEach(e -> {
+				System.out.println("Employee adding : " + e.getName());
+				try {
+					this.addEmployeeAndPayRoll(e.name, e.gender, e.salary, e.companyId, e.departmentName, e.startDate);
+				} catch (CustomSQLException e1) {
+					e1.printStackTrace();
+				}
+				System.out.println("Employee added : " + e.getName());
+			});
+		} else {
+			for (EmployeePayRoll e : employeeList) {
 				empPayRollList.add(e);
 			}
 		}
@@ -172,11 +174,11 @@ public class EmployeePayRollService {
 				System.out.println("Employee adding : " + Thread.currentThread().getName());
 				try {
 					this.addEmployeeAndPayRoll(e.name, e.gender, e.salary, e.companyId, e.departmentName, e.startDate);
-						additionStatus.put(e.hashCode(), true);
+					additionStatus.put(e.hashCode(), true);
 				} catch (CustomSQLException e1) {
 					e1.printStackTrace();
 				}
-					System.out.println("Employee added : " + Thread.currentThread().getName());
+				System.out.println("Employee added : " + Thread.currentThread().getName());
 			};
 			Thread thread = new Thread(task, e.name);
 			thread.start();
@@ -191,9 +193,8 @@ public class EmployeePayRollService {
 		}
 		return empPayRollList.size();
 	}
-	
-	public void updateSalaryInAllTables(String name,Double salary) throws CustomSQLException
-	{
+
+	public void updateSalaryInAllTables(String name, Double salary) throws CustomSQLException {
 		int success = employeePayRollDBService.updateSalaryInPayrollTable(name, salary);
 		if (success == 1) {
 			for (EmployeePayRoll e : empPayRollList) {
@@ -202,25 +203,25 @@ public class EmployeePayRollService {
 				}
 			}
 		}
-		
+
 	}
-	
-	public void updateMultipleSalary(HashMap<String,Double> salaryMap) throws CustomSQLException {
+
+	public void updateMultipleSalary(HashMap<String, Double> salaryMap) throws CustomSQLException {
 		HashMap<Integer, Boolean> additionStatus = new HashMap<Integer, Boolean>();
-		salaryMap.forEach((k,v) -> {
-				additionStatus.put(k.hashCode(), false);
-				Runnable task = () -> {			
-					try {
-						updateSalaryInAllTables(k,v);
-						additionStatus.put(k.hashCode(), true);
-					} catch (CustomSQLException e) {
-						e.printStackTrace();
-					}
-				};			
-				Thread thread = new Thread(task, k);
-				thread.start();
+		salaryMap.forEach((k, v) -> {
+			additionStatus.put(k.hashCode(), false);
+			Runnable task = () -> {
+				try {
+					updateSalaryInAllTables(k, v);
+					additionStatus.put(k.hashCode(), true);
+				} catch (CustomSQLException e) {
+					e.printStackTrace();
+				}
+			};
+			Thread thread = new Thread(task, k);
+			thread.start();
 		});
-		
+
 		while (additionStatus.containsValue(false)) {
 			try {
 				Thread.sleep(10);
