@@ -1,0 +1,21 @@
+{
+  "employee_payroll": [
+    {
+      "id": 1,
+      "name": "Tony",
+      "salary": 130000,
+      "companyId": 3,
+      "gender": "M",
+      "departmentName": [
+        "Management"
+      ],
+      "startDate": [
+        {
+          "year": 2008,
+          "month": 5,
+          "day": 1
+        }
+      ]
+    }
+  ]
+}

@@ -141,8 +141,9 @@ public class EmployeePayRollService {
 		return result;
 	}
 
-	public int addEmployeeAndPayRoll(List<EmployeePayRoll> employeeList) {
-
+	public int addEmployeeAndPayRoll(List<EmployeePayRoll> employeeList,String destination) {
+		if(destination.equals("DB"))
+		{
 		employeeList.forEach(e -> {
 			System.out.println("Employee adding : " + e.getName());
 			try {
@@ -152,6 +153,14 @@ public class EmployeePayRollService {
 			}
 			System.out.println("Employee added : " + e.getName());
 		});
+		}
+		else
+		{
+			for(EmployeePayRoll e : employeeList)
+			{
+				empPayRollList.add(e);
+			}
+		}
 		return empPayRollList.size();
 	}
 
