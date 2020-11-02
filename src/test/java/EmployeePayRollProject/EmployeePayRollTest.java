@@ -62,7 +62,7 @@ public class EmployeePayRollTest {
 		EmployeePayRollService empPayRollService = new EmployeePayRollService();
 		try {
 			int entries = empPayRollService.readData("DB");
-			empPayRollService.updateSalary(1, "Natasha", 90000.0,"DB");
+			empPayRollService.updateSalary(1, "Natasha", 90000.0, "DB");
 			boolean result = empPayRollService.checkDBInSyncWithList("Natasha");
 			Assert.assertTrue(result);
 		} catch (CustomSQLException e) {
@@ -75,7 +75,7 @@ public class EmployeePayRollTest {
 		EmployeePayRollService empPayRollService = new EmployeePayRollService();
 		try {
 			int entries = empPayRollService.readData("DB");
-			empPayRollService.updateSalary(2, "Natasha", 80000.0,"DB");
+			empPayRollService.updateSalary(2, "Natasha", 80000.0, "DB");
 			boolean result = empPayRollService.checkDBInSyncWithList("Natasha");
 			Assert.assertTrue(result);
 		} catch (CustomSQLException e) {
@@ -184,7 +184,7 @@ public class EmployeePayRollTest {
 		try {
 			int entries = empPayRollService.readData("DB");
 			System.out.println("before " + entries);
-			empPayRollService.deleteEmployee("Strange");
+			empPayRollService.deleteEmployee("Strange", "DB");
 			int entrie = empPayRollService.readData("DB");
 			System.out.println("after " + entrie);
 			boolean result = empPayRollService.checkIFDeletedFromList("Strange");
@@ -210,7 +210,7 @@ public class EmployeePayRollTest {
 					new EmployeePayRoll(0, "Natasha", "F", 60000.0, 3, Arrays.asList(departmentName),
 							Arrays.asList(LocalDate.parse("2020-04-29"))) };
 			Instant start = Instant.now();
-			int countOfEntries = empPayRollService.addEmployeeAndPayRoll(Arrays.asList(employeeArray),"DB");
+			int countOfEntries = empPayRollService.addEmployeeAndPayRoll(Arrays.asList(employeeArray), "DB");
 			Instant end = Instant.now();
 			System.out.println("Duration without Thread : " + Duration.between(start, end));
 			boolean result = countOfEntries == 7 ? true : false;
@@ -219,7 +219,7 @@ public class EmployeePayRollTest {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Test
 	public void givenMultipleEmployeeWithThreads_WhenAddedToDB_ShouldMatchCountOfEntries() {
 		EmployeePayRollService empPayRollService = new EmployeePayRollService();
@@ -237,30 +237,30 @@ public class EmployeePayRollTest {
 					new EmployeePayRoll(0, "Natasha", "F", 60000.0, 3, Arrays.asList(departmentName),
 							Arrays.asList(LocalDate.parse("2020-04-29"))) };
 			Instant start = Instant.now();
-			empPayRollService.addEmployeeAndPayRoll(Arrays.asList(employeeArray),"DB");
+			empPayRollService.addEmployeeAndPayRoll(Arrays.asList(employeeArray), "DB");
 			Instant end = Instant.now();
 			System.out.println("Duration without Thread : " + Duration.between(start, end));
 			Instant startThread = Instant.now();
 			int countOfEntries = empPayRollService.addEmployeeAndPayRollWithThread(Arrays.asList(employeeArray));
 			Instant endThread = Instant.now();
-			System.out.println("Duration with Thread : " + Duration.between(startThread, endThread));			
+			System.out.println("Duration with Thread : " + Duration.between(startThread, endThread));
 			boolean result = countOfEntries == 11 ? true : false;
 			Assert.assertTrue(result);
 		} catch (CustomSQLException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Test
 	public void givenUpdatedSalaries_UpdatingMultipleEmployeesinDB_UsingPreparedStatement_ShouldMatch() {
 		EmployeePayRollService empPayRollService = new EmployeePayRollService();
 		try {
 			int entries = empPayRollService.readData("DB");
-			HashMap<String,Double> salaryMap = new HashMap<String,Double>();
-			salaryMap.put("Tony",110000.0);
-			salaryMap.put("Steve",70000.0);
-			salaryMap.put("Peter",90000.0);
-			salaryMap.put("Natasha",40000.0);		
+			HashMap<String, Double> salaryMap = new HashMap<String, Double>();
+			salaryMap.put("Tony", 110000.0);
+			salaryMap.put("Steve", 70000.0);
+			salaryMap.put("Peter", 90000.0);
+			salaryMap.put("Natasha", 40000.0);
 			empPayRollService.updateMultipleSalary(salaryMap);
 			boolean result = empPayRollService.checkDBInSyncWithList("Natasha");
 			Assert.assertTrue(result);
@@ -268,109 +268,130 @@ public class EmployeePayRollTest {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Before
-	public void setup()
-	{
+	public void setup() {
 		RestAssured.baseURI = "http://localhost";
 		RestAssured.port = 3000;
+		RestAssured.config = RestAssuredConfig.config().connectionConfig(
+				new ConnectionConfig().closeIdleConnectionsAfterEachResponseAfter(1, TimeUnit.SECONDS));
 	}
-	
-	public Response addEmployeeToJsonServer(EmployeePayRoll employeePayroll)
-	{
+
+	public Response addEmployeeToJsonServer(EmployeePayRoll employeePayroll) {
 		String jsonString = new Gson().toJson(employeePayroll);
-		RequestSpecification request = RestAssured.given().config(RestAssuredConfig.config().connectionConfig(
-			    ConnectionConfig.connectionConfig().closeIdleConnectionsAfterEachResponse()));	
-		request.header("Content-Type","application/json");
+		RequestSpecification request = RestAssured.given().config(RestAssuredConfig.config()
+				.connectionConfig(ConnectionConfig.connectionConfig().closeIdleConnectionsAfterEachResponse()));
+		request.header("Content-Type", "application/json");
 		request.body(jsonString);
 		return request.post("/employee_payroll");
 	}
-	
-	public EmployeePayRoll[] getEmployeeList()
-	{
+
+	public EmployeePayRoll[] getEmployeeList() {
 		Response response = RestAssured.get("/employee_payroll/");
 		EmployeePayRoll[] employees = new Gson().fromJson(response.asString(), EmployeePayRoll[].class);
-		RestAssured.config = RestAssuredConfig.config().connectionConfig(new ConnectionConfig().closeIdleConnectionsAfterEachResponseAfter(1, TimeUnit.SECONDS));
 		return employees;
 	}
-	
+
 	@Test
-	public void employeeWhenAdded_ShouldMatchCount()
-	{
+	public void employeeWhenAdded_ShouldMatchCount() {
 		EmployeePayRoll[] employees = getEmployeeList();
-		EmployeePayRollService empPayRollService = new EmployeePayRollService(new ArrayList<EmployeePayRoll>(Arrays.asList(employees)));
+		EmployeePayRollService empPayRollService = new EmployeePayRollService(
+				new ArrayList<EmployeePayRoll>(Arrays.asList(employees)));
 		List<EmployeePayRoll> employeeList = new ArrayList<EmployeePayRoll>();
-		
-		EmployeePayRoll employee = new EmployeePayRoll(1,"Tony", "M",130000.0,3,Arrays.asList("Management"),
+
+		EmployeePayRoll employee = new EmployeePayRoll(1, "Tony", "M", 130000.0, 3, Arrays.asList("Management"),
 				Arrays.asList(LocalDate.parse("2008-05-01")));
 		Response response = addEmployeeToJsonServer(employee);
 		int statusCode = response.getStatusCode();
-		int countOfEntries=0;
-		if(statusCode==201)
-		{
+		int countOfEntries = 0;
+		if (statusCode == 201) {
 			employee = new Gson().fromJson(response.asString(), EmployeePayRoll.class);
 			employeeList.add(employee);
-			countOfEntries = empPayRollService.addEmployeeAndPayRoll(employeeList,"REST_IO");
+			countOfEntries = empPayRollService.addEmployeeAndPayRoll(employeeList, "REST_IO");
 		}
-		Assert.assertEquals(201,response.getStatusCode());
+		Assert.assertEquals(201, response.getStatusCode());
 		Assert.assertEquals(1, countOfEntries);
 	}
-	
+
 	@Test
-	public void givenMultipleEmployees_WhenAdded_ShouldMatchCount(){
+	public void givenMultipleEmployees_WhenAdded_ShouldMatchCount() {
 		EmployeePayRoll[] employees = getEmployeeList();
-		EmployeePayRollService empPayRollService = new EmployeePayRollService(new ArrayList<EmployeePayRoll>(Arrays.asList(employees)));
+		EmployeePayRollService empPayRollService = new EmployeePayRollService(
+				new ArrayList<EmployeePayRoll>(Arrays.asList(employees)));
 		List<EmployeePayRoll> employeeList = new ArrayList<EmployeePayRoll>();
-		int countOfEntries=0;
-		EmployeePayRoll[] employeesData =  {
+		int countOfEntries = 0;
+		EmployeePayRoll[] employeesData = {
 				new EmployeePayRoll(2, "Steve", "M", 100000.0, 3, Arrays.asList("Management"),
 						Arrays.asList(LocalDate.parse("2011-07-29"))),
 				new EmployeePayRoll(3, "Peter", "M", 70000.0, 4, Arrays.asList("Management"),
 						Arrays.asList(LocalDate.parse("2017-07-07"))),
 				new EmployeePayRoll(4, "Natasha", "F", 60000.0, 3, Arrays.asList("Management"),
 						Arrays.asList(LocalDate.parse("2020-04-29"))) };
-		for(EmployeePayRoll employee : employeesData)
-		{
-		Response response = addEmployeeToJsonServer(employee);
-		int statusCode = response.getStatusCode();
-		if(statusCode==201)
-		{
-			employee = new Gson().fromJson(response.asString(), EmployeePayRoll.class);
-			employeeList.add(employee);
+		for (EmployeePayRoll employee : employeesData) {
+			Response response = addEmployeeToJsonServer(employee);
+			int statusCode = response.getStatusCode();
+			if (statusCode == 201) {
+				employee = new Gson().fromJson(response.asString(), EmployeePayRoll.class);
+				employeeList.add(employee);
+			}
+			Assert.assertEquals(201, response.getStatusCode());
 		}
-		Assert.assertEquals(201,response.getStatusCode());
-		}
-		countOfEntries = empPayRollService.addEmployeeAndPayRoll(employeeList,"REST_IO");
+		countOfEntries = empPayRollService.addEmployeeAndPayRoll(employeeList, "REST_IO");
 		Assert.assertEquals(4, countOfEntries);
 	}
-	
+
 	@Test
-	public void givenNewSalary_WhenUpdated_ShouldReturnSucessCode(){
+	public void givenNewSalary_WhenUpdated_ShouldReturnSucessCode() {
 		EmployeePayRoll[] employees = getEmployeeList();
-		EmployeePayRollService empPayRollService = new EmployeePayRollService(new ArrayList<EmployeePayRoll>(Arrays.asList(employees)));
-		
-		EmployeePayRoll employeePayRoll = new EmployeePayRoll(4, "Natasha", "F", 80000.0, 3, Arrays.asList("Management"),
-				Arrays.asList(LocalDate.parse("2020-04-29")));
+		EmployeePayRollService empPayRollService = new EmployeePayRollService(
+				new ArrayList<EmployeePayRoll>(Arrays.asList(employees)));
+
+		EmployeePayRoll employeePayRoll = new EmployeePayRoll(4, "Natasha", "F", 80000.0, 3,
+				Arrays.asList("Management"), Arrays.asList(LocalDate.parse("2020-04-29")));
 		try {
 			empPayRollService.updateSalary(0, "Natasha", 80000.0, "REST_IO");
 		} catch (CustomSQLException e) {
 			e.printStackTrace();
 		}
 		String jsonString = new Gson().toJson(employeePayRoll);
-		RequestSpecification request = RestAssured.given();	
-		request.header("Content-Type","application/json");
+		RequestSpecification request = RestAssured.given();
+		request.header("Content-Type", "application/json");
 		request.body(jsonString);
-		Response  response = request.put("/employee_payroll/"+employeePayRoll.id);
+		Response response = request.put("/employee_payroll/" + employeePayRoll.id);
 		int statusCode = response.getStatusCode();
 		Assert.assertEquals(200, statusCode);
 	}
-	
+
 	@Test
-	public void retreiveEmployees_FromJsonServer_ShouldMatchCount(){
+	public void retreiveEmployees_FromJsonServer_ShouldMatchCount() {
 		EmployeePayRoll[] employees = getEmployeeList();
-		EmployeePayRollService empPayRollService = new EmployeePayRollService(new ArrayList<EmployeePayRoll>(Arrays.asList(employees)));
+		EmployeePayRollService empPayRollService = new EmployeePayRollService(
+				new ArrayList<EmployeePayRoll>(Arrays.asList(employees)));
 		int CountOfEntries = empPayRollService.noOfEntries("REST_IO");
 		Assert.assertEquals(4, CountOfEntries);
+	}
+
+	@Test
+	public void deleteEmployee_FromJsonServer_ShouldMatchCount() {
+		EmployeePayRoll[] employees = getEmployeeList();
+		EmployeePayRollService empPayRollService = new EmployeePayRollService(
+				new ArrayList<EmployeePayRoll>(Arrays.asList(employees)));
+		EmployeePayRoll employeePayRoll = new EmployeePayRoll(4, "Natasha", "F", 80000.0, 3,
+				Arrays.asList("Management"), Arrays.asList(LocalDate.parse("2020-04-29")));
+		
+		RequestSpecification request = RestAssured.given();
+		request.header("Content-Type", "application/json");
+		Response response = request.delete("/employee_payroll/" + employeePayRoll.id);
+		int statusCode = response.getStatusCode();
+			
+		try {
+			empPayRollService.deleteEmployee("Natasha", "REST_IO");
+		} catch (CustomSQLException e) {
+			e.printStackTrace();
+		}
+		int CountOfEntries = empPayRollService.noOfEntries("REST_IO");
+		Assert.assertEquals(200, statusCode);
+		Assert.assertEquals(3, CountOfEntries);
 	}
 
 }

@@ -50,23 +50,6 @@
           "day": 7
         }
       ]
-    },
-    {
-      "id": 4,
-      "name": "Natasha",
-      "salary": 80000,
-      "companyId": 3,
-      "gender": "F",
-      "departmentName": [
-        "Management"
-      ],
-      "startDate": [
-        {
-          "year": 2020,
-          "month": 4,
-          "day": 29
-        }
-      ]
     }
   ]
 }
