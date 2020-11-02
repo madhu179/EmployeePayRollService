@@ -16,6 +16,57 @@
           "day": 1
         }
       ]
+    },
+    {
+      "id": 2,
+      "name": "Steve",
+      "salary": 100000,
+      "companyId": 3,
+      "gender": "M",
+      "departmentName": [
+        "Management"
+      ],
+      "startDate": [
+        {
+          "year": 2011,
+          "month": 7,
+          "day": 29
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Peter",
+      "salary": 70000,
+      "companyId": 4,
+      "gender": "M",
+      "departmentName": [
+        "Management"
+      ],
+      "startDate": [
+        {
+          "year": 2017,
+          "month": 7,
+          "day": 7
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Natasha",
+      "salary": 60000,
+      "companyId": 3,
+      "gender": "F",
+      "departmentName": [
+        "Management"
+      ],
+      "startDate": [
+        {
+          "year": 2020,
+          "month": 4,
+          "day": 29
+        }
+      ]
     }
   ]
 }
